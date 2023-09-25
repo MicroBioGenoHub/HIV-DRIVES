@@ -7,7 +7,7 @@ HIV-DRIVES -f <path of forward read> -r <path of reverse read> -o <output direct
 ```
 2. Same as above (1) but with multiple samples
 	- To run, create a tab separated file. This file starts with a line that describes the mode to run. The line is followed by 4 columns. Each line or row represents a single sample. The first column should have the name of the directory to be created for that sample, second column has path of the forward read, third column has path of the reverse read, and the fourth column describing the layout which is paired for this case
-	- Refer to multiple.md for a detailed description
+	- Refer to [Multiple sample instructions](multiple.md) for a detailed description
 ```
 HIV-DRIVES_multiple <created tab separated file>
 ```
@@ -18,7 +18,7 @@ HIV-DRIVES -f <path of forward read> -r <path of reverse read> -o <output direct
 ```
 4. Same as above (3) but with multiple samples
 	- To run, create a tab separated file. This file starts with a line that describes the mode to run. The line is followed by 4 columns. Each line or row represents a single sample. The first column should have the name of the directory to be created for that sample, second column has path of the forward read, third column has path of the reverse read, and the fourth column describing the layout which is paired for this case
-	- Refer to multiple.md for a detailed description
+	- Refer to [Multiple sample instructions](multiple.md) for a detailed description
 ```
 HIV-DRIVES_multiple <created tab separated file>
 ```
@@ -29,7 +29,7 @@ HIV-DRIVES --single-end true --se <path of single ended read> -o <output directo
 ```
 6. Same as above (5) but with multiple samples
 	- To run, create a tab separated file. This file starts with a line that describes the mode to run. The line is followed by 3 columns. Each line or row represents a single sample. The first column should have the name of the directory to be created for that sample, second column has path of the single ended read, and the third column describing the layout which is se for this case
-	- Refer to multiple.md for a detailed description
+	- Refer to [Multiple sample instructions](multiple.md) for a detailed description
 ```
 HIV-DRIVES_multiple <created tab separated file>
 ```
@@ -40,7 +40,7 @@ HIV-DRIVES -o <output directory to be created> --single-end true --se <path of s
 ```
 8. Same as above (7) but with multiple samples
 	- To run, create a tab separated file. This file starts with a line that describes the mode to run. The line is followed by 3 columns. Each line or row represents a single sample. The first column should have the name of the directory to be created for that sample, second column has path of the single ended read, and the third column describing the layout which is se for this case
-	- Refer to multiple.md for a detailed description
+	- Refer to [Multiple sample instructions](multiple.md) for a detailed description
 ```
 HIV-DRIVES_multiple <created tab separated file>
 ```
@@ -50,12 +50,12 @@ HIV-DRIVES -o <output directory to be created> --consensus <path of fasta file> 
 ```
 10. I have several fasta files, I want to get resistance profiles for each
 	- To run, create a tab separated file. This file starts with a line that describes the mode to run. The line is followed by 3 columns. Each line or row represents a single sample. The first column should have the name of the directory to be created for that sample, second column has path of the fasta file, and the third column describing  will be consensus for this case
-	- Refer to multiple.md for a detailed description
+	- Refer to [Multiple sample instructions](multiple.md) for a detailed description
 11. I have a sanger file in ab1.seq format, I want to get resistance profiles
 ```
 HIV-DRIVES -o <output directory to be created> --sanger <path of ab1.seq file> --resistance true
 ```
 10. I have several sanger files, I want to get resistance profiles for each
         - To run, create a tab separated file. This file starts with a line that describes the mode to run. The line is followed by 3 columns. Each line or row represents a single sample. The first column should have the name of the directory to be created for that sample, second column has path of the ab1.seq file, and the third column describing  will be sanger for this case
-        - Refer to multiple.md for a detailed description
+        - Refer to [Multiple sample instructions](multiple.md) for a detailed description
 
