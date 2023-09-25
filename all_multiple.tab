@@ -1,0 +1,25 @@
+## To apply the all mode to your files, follow the instructions in this template. 
+## First, uncomment (remove the #) at the line (3) with (mode)
+#mode: all
+
+### For paired ended formats, follow the input below. The line beginning with #### is a header to guide the user
+####unique_output_dir	R1	R2	layout
+#example1	pathRead1_1.fastq.gz	pathRead2_2.fastq.gz	paired
+
+# enter your data below following the above format
+
+
+
+
+
+
+
+
+
+
+### For single ended formats, follow the input below. The line beginning with #### is a header to guide the user
+####unique_output_dir   R       layout
+#example2  pathRead.fastq.gz   se
+
+
+# enter your data below following the above format
