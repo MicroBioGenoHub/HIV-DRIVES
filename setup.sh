@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 . "$CONDA_PREFIX/etc/profile.d/conda.sh"
-conda activate HIV-trial
+conda activate HIV-DRIVES
 pref_conda=$(echo $CONDA_PREFIX)
 HIVDIR="$pref_conda/envs/HIV-DRIVES"
 mkdir "$HIVDIR"/accessories
