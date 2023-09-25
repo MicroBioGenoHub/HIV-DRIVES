@@ -21,7 +21,7 @@ Note: Besides, the pdf report, the pipeline produces aavf, vcf, drms20.csv with 
 # Installation
 
 ```
-git clone https://github.com/Kanyerezi30/HIV-DRIVES.git
+git clone https://github.com/MicroBioGenoHub/HIV-DRIVES.git
 
 bash install.sh
 ```
@@ -31,21 +31,5 @@ bash install.sh
 ```
 HIV-DRIVES -o <output_dir> -f <forward read path> -r <reverse read path> --all true
 ```
-
-# Progress
-
-- Quality assessment has been implemented
-- Host Decontamination has been implemented 
-- Variant calling has been implemented
-- Consensus generation has been implemented
-
-# Next
-
-- Other pathogen decontamination
-- Coverage graphs
-- Resistance, subtype, mutations, genes detection
-- Phylogenetics
-- Statistical analysis
-- Sanger and minion implementation
 
 Note: Current tests are on Ubuntu 18.04.6 LTS using paired end reads from the illumina platform
