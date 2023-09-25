@@ -1,3 +1,7 @@
+<p align="middle">`
+<img width="550" height="300" src="databases/logo.png">
+</p>
+
 ## 🎬 HIV-DRIVES: HIV Drug Resistance Identification, Variant Evaluation, & Surveillance
 
 HIV-DRIVES is a pipeline designed to perform HIV Drug resistance profiling, Variant Evaluation, and Surveillance while giving an easy to read pdf report besides the other output files. HIV-DRIVES supports illumina data in paired and single ended fastq format, sanger data in ab1.seq format, and both fasta and multiple fasta files. Given illumina data, HIV-DRIVES additionally separates the patient's reads from the viral reads before it proceeds with the downstream processes. Therefore, this facilitates sharing of viral reads while protecting the patient's privacy. HIV-DRIVES is supported by both sierra-local and quasitools in the background
@@ -145,6 +149,8 @@ The software developing team works round the clock to ensure the bugs within the
 For support or any inquiry:
 You can submit your query using the [issue tracker](https://github.com/MicroBioGenoHub/HIV-DRIVES/issues)
 
-
+<p align="middle">`
+<img width="550" height="300" src="databases/logo.png">
+</p>
 
 Note: Current tests are on Ubuntu 18.04.6 LTS using paired end reads from the illumina platform
