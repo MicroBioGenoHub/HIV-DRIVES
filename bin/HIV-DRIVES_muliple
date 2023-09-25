@@ -63,8 +63,6 @@ then
 			echo "Display $filep"
 			cat $filep
 			source HIV-DRIVES -o $i --resistance true --$filet  $filep
-			echo "Display $filep"
-			cat $filep
 		)
 		# check the exit status
 		if [ $? -ne 0 ]

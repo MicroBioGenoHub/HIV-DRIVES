@@ -77,7 +77,7 @@ Other options:
 
 	--cores			Number of cpus to use. Default=4
                      
-For further explanation please visit: https://github.com/Kanyerezi30/HIV-DRIVES
+For further explanation please visit: https://github.com/MicroBioGenoHub/HIV-DRIVES
 EOF
 #    echo -e ${Off}
 }
