@@ -51,17 +51,14 @@ fi
 
 # This is for running multiple samples given the tab file
 mode=$(grep mode $intab | grep -v "#" | cut -f2 -d":" | sed 's/ //g')
-echo $mode
+echo "=====================Running $mode mode============================================"
 if [ "$mode" = "resistance" ]
 then
 	for i in $(cut -f1 $intab | grep -Ev "#|mode" | sed 's/[ \t]//g' | sed '/^$/d')
 	do
 		filet=$(grep -w $i $intab | grep -v "#" | cut -f3)
 		filep=$(grep -w $i $intab | grep -v "#" | cut -f2)
-		echo "$filet,$filep"
 		(
-			echo "Display $filep"
-			cat $filep
 			source HIV-DRIVES -o $i --resistance true --$filet  $filep
 		)
 		# check the exit status
