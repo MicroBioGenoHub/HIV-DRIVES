@@ -140,7 +140,7 @@ This softwares' foundation is built using pre-existing tools. When using it, ple
 
 The software developing team works round the clock to ensure the bugs within the program are captured and fixed.
 For support or any inquiry:
-You can submit your query using the [Issue Tracker](https://github.com/GunzIvan28/rMAP/issues)
+You can submit your query using the [issue tracker](https://github.com/MicroBioGenoHub/HIV-DRIVES/issues)
 
 
 
