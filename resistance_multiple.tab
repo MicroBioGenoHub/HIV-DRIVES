@@ -1,0 +1,23 @@
+## To apply the resistance mode to your files, follow the instructions in this template. 
+## First, uncomment (remove the #) at the beginning of line (3) with (mode)
+#mode: resistance
+
+### If you've got fasta files, follow the input below. The line beginning with #### is a header to guide the user
+####unique_output_dir   file    type
+#example1  pathFasta.fasta    consensus
+
+# enter your data below following the above format. Don't include the # at the beginning
+
+
+
+
+### If you've got sanger files in ab1.seq format, follow the input below. The line beginning with #### is a header to guide the user
+####unique_output_dir   file    type
+#example2  pathSanger.ab1.seq    sanger
+
+# enter your data below following the above format. Don't include the # at the beginning
+
+
+
+
+
