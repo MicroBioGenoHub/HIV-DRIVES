@@ -33,6 +33,8 @@ Clone the software from the offical repository using:
 
 Select the installer for your computer and execute it by running: 
 
+`cd HIV-DRIVES`
+
 `conda env create -n HIV-DRIVES --file HIV-DRIVES-1.0-Linux-Installer.yml`
 
 `bash setup.sh`
