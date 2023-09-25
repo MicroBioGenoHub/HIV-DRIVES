@@ -23,6 +23,8 @@ Note: Besides, the pdf report, the pipeline produces aavf, vcf, drms20.csv with 
 Make sure you have [Miniconda](https://conda.io/miniconda.html) or [Anaconda](https://docs.anaconda.com/free/anaconda/install/linux/) on your Linux system using the links provided
 Clone the software from the offical repository using: 
 
+`conda activate base`
+
 `cd && git clone https://github.com/MicroBioGenoHub/HIV-DRIVES.git`
 
 Select the installer for your computer and execute it by running: 
