@@ -1,0 +1,22 @@
+name: HIV-DRIVES
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.9.0
+  - trim-galore
+  - minimap2
+  - r-base=4.1.1
+  - r-rmarkdown=2.14
+  - r-jsonlite=1.8.0
+  - r-knitr=1.39
+  - r-dplyr=1.0.9
+  - r-kableextra
+  - r-tidyr=1.2.0
+  - pip:
+      - requests
+      - more-itertools==9.1.0
+      - orjson==3.9.1
+      - types-setuptools==67.8.0.0
+      - Cython==0.29.32
