@@ -1,0 +1,26 @@
+DRUG CLASS,ABBREVIATION,DRUG NAME
+PI,ATV,Atazanavir
+PI,DRV,Darunavir
+PI,FPV,Fosamprenavir
+PI,IDV,Indinavir
+PI,LPV,Lopinavir
+PI,NFV,Nelfinavir
+PI,SQV,Saquinavir
+PI,TPV,Tipranavir
+NRTI,ABC,Abacavir
+NRTI,AZT,Azidothymidine
+NRTI,DFT,Stavudine
+NRTI,DDI,Didanosine
+NRTI,FTC,Emtricitabine
+NRTI,LMV,Lamivudine
+NRTI,TDF,Tenofovir
+NNRTI,DOR,Doravirine
+NNRTI,EFV,Efavirenz
+NNRTI,ETR,Etravirine
+NNRTI,NVP,Nevirapine
+NNRTI,RPV,Rilpivirine
+INSTI,BIC,Bictegravir
+INSTI,CAB,Cabotegravir
+INSTI,DTG,Dolutegravir
+INSTI,EVG,Elvitegravir
+INSTI,RAL,Raltegravir

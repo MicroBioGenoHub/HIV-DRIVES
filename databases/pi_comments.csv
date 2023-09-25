@@ -1,0 +1,246 @@
+﻿
+L10F	Accessory,"L10F is a common non-polymorphic, PI-selected accessory mutation associated with reduced in vitro susceptibility to LPV and DRV."
+L10LF	Accessory,"L10F is a common non-polymorphic, PI-selected accessory mutation associated with reduced in vitro susceptibility to LPV and DRV."
+L10FL	Accessory,"L10F is a common non-polymorphic, PI-selected accessory mutation associated with reduced in vitro susceptibility to LPV and DRV."
+L10I	Other,"L10I/V are polymorphic, PI-selected accessory mutations that increase the replication of viruses with other PI-resistance mutations."
+L10LI	Other,"L10I/V are polymorphic, PI-selected accessory mutations that increase the replication of viruses with other PI-resistance mutations."
+L10IL	Other,"L10I/V are polymorphic, PI-selected accessory mutations that increase the replication of viruses with other PI-resistance mutations."
+L10V	Other,"L10I/V are polymorphic, PI-selected accessory mutations that increase the replication of viruses with other PI-resistance mutations."
+L10VL	Other,"L10I/V are polymorphic, PI-selected accessory mutations that increase the replication of viruses with other PI-resistance mutations."
+L10LV	Other,"L10I/V are polymorphic, PI-selected accessory mutations that increase the replication of viruses with other PI-resistance mutations."
+L10RY	Other,"L10R/Y are rare, non-polymorphic PI-selected mutations. Their effects on PI susceptibility have not been well studied."
+L10R	Other,"L10R/Y are rare, non-polymorphic PI-selected mutations. Their effects on PI susceptibility have not been well studied."
+L10LR	Other,"L10R/Y are rare, non-polymorphic PI-selected mutations. Their effects on PI susceptibility have not been well studied."
+L10RL	Other,"L10R/Y are rare, non-polymorphic PI-selected mutations. Their effects on PI susceptibility have not been well studied."
+L10Y	Other,"L10R/Y are rare, non-polymorphic PI-selected mutations. Their effects on PI susceptibility have not been well studied."
+L10LY	Other,"L10R/Y are rare, non-polymorphic PI-selected mutations. Their effects on PI susceptibility have not been well studied."
+L10YL	Other,"L10R/Y are rare, non-polymorphic PI-selected mutations. Their effects on PI susceptibility have not been well studied."
+V11IL	Other,V11I/L are relatively non-polymorphic accessory mutation selected in persons receiving DRV. V11L is a nonpolymorphic PI-selected mutation associated with reduced in vitro DRV susceptibility when it occurs in combination with other PI-resistance mutations.
+V11I	Other,V11I/L are relatively non-polymorphic accessory mutation selected in persons receiving DRV. V11L is a nonpolymorphic PI-selected mutation associated with reduced in vitro DRV susceptibility when it occurs in combination with other PI-resistance mutations.
+V11VI	Other,V11I/L are relatively non-polymorphic accessory mutation selected in persons receiving DRV. V11L is a nonpolymorphic PI-selected mutation associated with reduced in vitro DRV susceptibility when it occurs in combination with other PI-resistance mutations.
+V11IV	Other,V11I/L are relatively non-polymorphic accessory mutation selected in persons receiving DRV. V11L is a nonpolymorphic PI-selected mutation associated with reduced in vitro DRV susceptibility when it occurs in combination with other PI-resistance mutations.
+V11L	Other,V11I/L are relatively non-polymorphic accessory mutation selected in persons receiving DRV. V11L is a nonpolymorphic PI-selected mutation associated with reduced in vitro DRV susceptibility when it occurs in combination with other PI-resistance mutations.
+V11VL	Other,V11I/L are relatively non-polymorphic accessory mutation selected in persons receiving DRV. V11L is a nonpolymorphic PI-selected mutation associated with reduced in vitro DRV susceptibility when it occurs in combination with other PI-resistance mutations.
+V11LV	Other,V11I/L are relatively non-polymorphic accessory mutation selected in persons receiving DRV. V11L is a nonpolymorphic PI-selected mutation associated with reduced in vitro DRV susceptibility when it occurs in combination with other PI-resistance mutations.
+K20I	Other,"K20I is the consensus amino acid in subtype G and CRF02_AG. In subtypes B and C, K20I is a PI-selected mutation of uncertain effects on currently used PIs."
+K20KI	Other,"K20I is the consensus amino acid in subtype G and CRF02_AG. In subtypes B and C, K20I is a PI-selected mutation of uncertain effects on currently used PIs."
+K20IK	Other,"K20I is the consensus amino acid in subtype G and CRF02_AG. In subtypes B and C, K20I is a PI-selected mutation of uncertain effects on currently used PIs."
+K20MV	Other,K20M/V are uncommonrelatively non-polymorphic PI-selected mutations that have not been well studied.
+K20M	Other,K20M/V are uncommonrelatively non-polymorphic PI-selected mutations that have not been well studied.
+K20KM	Other,K20M/V are uncommonrelatively non-polymorphic PI-selected mutations that have not been well studied.
+K20MK	Other,K20M/V are uncommonrelatively non-polymorphic PI-selected mutations that have not been well studied.
+K20V	Other,K20M/V are uncommonrelatively non-polymorphic PI-selected mutations that have not been well studied.
+K20KV	Other,K20M/V are uncommonrelatively non-polymorphic PI-selected mutations that have not been well studied.
+K20VK	Other,K20M/V are uncommonrelatively non-polymorphic PI-selected mutations that have not been well studied.
+K20R	Other,K20R is a highly polymorphic PI-selected accessory mutation that increases replication fitness in viruses with PI-resistance mutations.
+K20KR	Other,K20R is a highly polymorphic PI-selected accessory mutation that increases replication fitness in viruses with PI-resistance mutations.
+K20RK	Other,K20R is a highly polymorphic PI-selected accessory mutation that increases replication fitness in viruses with PI-resistance mutations.
+K20T	Accessory,K20T is a non-polymorphic accessory PI-selected mutation associated with reduced susceptibility to ATV and LPV.
+K20KT	Accessory,K20T is a non-polymorphic accessory PI-selected mutation associated with reduced susceptibility to ATV and LPV.
+K20TK	Accessory,K20T is a non-polymorphic accessory PI-selected mutation associated with reduced susceptibility to ATV and LPV.
+L23I	Accessory,L23I is an uncommon non-polymorphic mutation selected primarily by NFV. It appears to have minimal if any effects on the susceptibility to other PIs.
+L23LI	Accessory,L23I is an uncommon non-polymorphic mutation selected primarily by NFV. It appears to have minimal if any effects on the susceptibility to other PIs.
+L23IL	Accessory,L23I is an uncommon non-polymorphic mutation selected primarily by NFV. It appears to have minimal if any effects on the susceptibility to other PIs.
+L24FM	Accessory,L24I is a non-polymorphic mutation selected by IDV and LPV. It contributes reduced susceptibility to ATV and LPV. L24F/M are uncommon non-polymorphic PI-selected mutations. L24F has a susceptibility profile similar to L24I.
+L24F	Accessory,L24I is a non-polymorphic mutation selected by IDV and LPV. It contributes reduced susceptibility to ATV and LPV. L24F/M are uncommon non-polymorphic PI-selected mutations. L24F has a susceptibility profile similar to L24I.
+L24LF	Accessory,L24I is a non-polymorphic mutation selected by IDV and LPV. It contributes reduced susceptibility to ATV and LPV. L24F/M are uncommon non-polymorphic PI-selected mutations. L24F has a susceptibility profile similar to L24I.
+L24FL	Accessory,L24I is a non-polymorphic mutation selected by IDV and LPV. It contributes reduced susceptibility to ATV and LPV. L24F/M are uncommon non-polymorphic PI-selected mutations. L24F has a susceptibility profile similar to L24I.
+L24M	Accessory,L24I is a non-polymorphic mutation selected by IDV and LPV. It contributes reduced susceptibility to ATV and LPV. L24F/M are uncommon non-polymorphic PI-selected mutations. L24F has a susceptibility profile similar to L24I.
+L24LM	Accessory,L24I is a non-polymorphic mutation selected by IDV and LPV. It contributes reduced susceptibility to ATV and LPV. L24F/M are uncommon non-polymorphic PI-selected mutations. L24F has a susceptibility profile similar to L24I.
+L24ML	Accessory,L24I is a non-polymorphic mutation selected by IDV and LPV. It contributes reduced susceptibility to ATV and LPV. L24F/M are uncommon non-polymorphic PI-selected mutations. L24F has a susceptibility profile similar to L24I.
+L24I	Accessory,L24I is a non-polymorphic mutation selected by IDV and LPV. It contributes reduced susceptibility to ATV and LPV.
+L24LI	Accessory,L24I is a non-polymorphic mutation selected by IDV and LPV. It contributes reduced susceptibility to ATV and LPV.
+L24IL	Accessory,L24I is a non-polymorphic mutation selected by IDV and LPV. It contributes reduced susceptibility to ATV and LPV.
+D30N	Major,D30N is a non-polymorphic mutation NFV-selected mutation that causes high-level resistance to NFV but not to other PIs.
+D30DN	Major,D30N is a non-polymorphic mutation NFV-selected mutation that causes high-level resistance to NFV but not to other PIs.
+D30ND	Major,D30N is a non-polymorphic mutation NFV-selected mutation that causes high-level resistance to NFV but not to other PIs.
+V32I	Major,"V32I is a non-polymorphic mutation selected by LPV, ATV, and DRV which is associated with reduced susceptibility to each of these PIs."
+V32VI	Major,"V32I is a non-polymorphic mutation selected by LPV, ATV, and DRV which is associated with reduced susceptibility to each of these PIs."
+V32IV	Major,"V32I is a non-polymorphic mutation selected by LPV, ATV, and DRV which is associated with reduced susceptibility to each of these PIs."
+L33F	Accessory,"L33F is a relatively non-polymorphic accessory mutation selected by each of the PIs. In combination with other PI-resistance mutations, it is associated with reduced susceptibility to LPV, ATV, and DRV."
+L33LF	Accessory,"L33F is a relatively non-polymorphic accessory mutation selected by each of the PIs. In combination with other PI-resistance mutations, it is associated with reduced susceptibility to LPV, ATV, and DRV."
+L33FL	Accessory,"L33F is a relatively non-polymorphic accessory mutation selected by each of the PIs. In combination with other PI-resistance mutations, it is associated with reduced susceptibility to LPV, ATV, and DRV."
+L33IV	Other,L33I/V are minimally polymorphic mutations that do not appear to be selected by PIs or to reduce their susceptibility.
+L33I	Other,L33I/V are minimally polymorphic mutations that do not appear to be selected by PIs or to reduce their susceptibility.
+L33LI	Other,L33I/V are minimally polymorphic mutations that do not appear to be selected by PIs or to reduce their susceptibility.
+L33IL	Other,L33I/V are minimally polymorphic mutations that do not appear to be selected by PIs or to reduce their susceptibility.
+L33V	Other,L33I/V are minimally polymorphic mutations that do not appear to be selected by PIs or to reduce their susceptibility.
+L33LV	Other,L33I/V are minimally polymorphic mutations that do not appear to be selected by PIs or to reduce their susceptibility.
+L33VL	Other,L33I/V are minimally polymorphic mutations that do not appear to be selected by PIs or to reduce their susceptibility.
+K43T	Accessory,K43T is a nonpolymorphic accessory mutation selected by ATV and LPV. Its phenotypic effect on currently used PIs is uncertain.
+K43KT	Accessory,K43T is a nonpolymorphic accessory mutation selected by ATV and LPV. Its phenotypic effect on currently used PIs is uncertain.
+K43TK	Accessory,K43T is a nonpolymorphic accessory mutation selected by ATV and LPV. Its phenotypic effect on currently used PIs is uncertain.
+M46IL	Major,"M46I/L are relatively non-polymorphic PI-selected mutations. In combination with other PI-resistance mutations, they are associated with reduced susceptibility to each of the PIs except DRV."
+M46I	Major,"M46I/L are relatively non-polymorphic PI-selected mutations. In combination with other PI-resistance mutations, they are associated with reduced susceptibility to each of the PIs except DRV."
+M46MI	Major,"M46I/L are relatively non-polymorphic PI-selected mutations. In combination with other PI-resistance mutations, they are associated with reduced susceptibility to each of the PIs except DRV."
+M46IM	Major,"M46I/L are relatively non-polymorphic PI-selected mutations. In combination with other PI-resistance mutations, they are associated with reduced susceptibility to each of the PIs except DRV."
+M46L	Major,"M46I/L are relatively non-polymorphic PI-selected mutations. In combination with other PI-resistance mutations, they are associated with reduced susceptibility to each of the PIs except DRV."
+M46ML	Major,"M46I/L are relatively non-polymorphic PI-selected mutations. In combination with other PI-resistance mutations, they are associated with reduced susceptibility to each of the PIs except DRV."
+M46LM	Major,"M46I/L are relatively non-polymorphic PI-selected mutations. In combination with other PI-resistance mutations, they are associated with reduced susceptibility to each of the PIs except DRV."
+M46V	Accessory,"M46I/L are relatively non-polymorphic PI-selected mutations. In combination with other PI-resistance mutations, they are associated with reduced susceptibility to each of the PIs except DRV. M46V is a rare non-polymorphic PI-selected mutation that has not been well studied."
+M46MV	Accessory,"M46I/L are relatively non-polymorphic PI-selected mutations. In combination with other PI-resistance mutations, they are associated with reduced susceptibility to each of the PIs except DRV. M46V is a rare non-polymorphic PI-selected mutation that has not been well studied."
+M46VM	Accessory,"M46I/L are relatively non-polymorphic PI-selected mutations. In combination with other PI-resistance mutations, they are associated with reduced susceptibility to each of the PIs except DRV. M46V is a rare non-polymorphic PI-selected mutation that has not been well studied."
+I47A	Major,I47A is a non-polymorphic mutation selected by LPV. It usually occurs in combination with V32I and in this context it confers high-level resistance to LPV and low-level resistance to DRV.
+I47IA	Major,I47A is a non-polymorphic mutation selected by LPV. It usually occurs in combination with V32I and in this context it confers high-level resistance to LPV and low-level resistance to DRV.
+I47AI	Major,I47A is a non-polymorphic mutation selected by LPV. It usually occurs in combination with V32I and in this context it confers high-level resistance to LPV and low-level resistance to DRV.
+I47V	Major,I47V is a non-polymorphic PI-selected mutation associated with reduced susceptibility to LPV and DRV.
+I47IV	Major,I47V is a non-polymorphic PI-selected mutation associated with reduced susceptibility to LPV and DRV.
+I47VI	Major,I47V is a non-polymorphic PI-selected mutation associated with reduced susceptibility to LPV and DRV.
+G48ASTQL	Major,G48V is a nonpolymorphic mutation selected by SQV and less often by IDV and LPV. It confers intermediate resistance to ATV but has little if any effect on LPV susceptibility. G48M is an uncommon 2-base-pair nonpolymorphic substrate-cleft mutation nearly always selected in viruses with multiple PI-resistance mutations. It has a resistance profile similar to G48V. G48A/S/T/Q/L are extremely rare nonpolymorphic PI-selected mutations nearly always selected in viruses with multiple PI-resistance mutations.
+G48A	Major,G48V is a nonpolymorphic mutation selected by SQV and less often by IDV and LPV. It confers intermediate resistance to ATV but has little if any effect on LPV susceptibility. G48M is an uncommon 2-base-pair nonpolymorphic substrate-cleft mutation nearly always selected in viruses with multiple PI-resistance mutations. It has a resistance profile similar to G48V. G48A/S/T/Q/L are extremely rare nonpolymorphic PI-selected mutations nearly always selected in viruses with multiple PI-resistance mutations.
+G48GA	Major,G48V is a nonpolymorphic mutation selected by SQV and less often by IDV and LPV. It confers intermediate resistance to ATV but has little if any effect on LPV susceptibility. G48M is an uncommon 2-base-pair nonpolymorphic substrate-cleft mutation nearly always selected in viruses with multiple PI-resistance mutations. It has a resistance profile similar to G48V. G48A/S/T/Q/L are extremely rare nonpolymorphic PI-selected mutations nearly always selected in viruses with multiple PI-resistance mutations.
+G48AG	Major,G48V is a nonpolymorphic mutation selected by SQV and less often by IDV and LPV. It confers intermediate resistance to ATV but has little if any effect on LPV susceptibility. G48M is an uncommon 2-base-pair nonpolymorphic substrate-cleft mutation nearly always selected in viruses with multiple PI-resistance mutations. It has a resistance profile similar to G48V. G48A/S/T/Q/L are extremely rare nonpolymorphic PI-selected mutations nearly always selected in viruses with multiple PI-resistance mutations.
+G48S	Major,G48V is a nonpolymorphic mutation selected by SQV and less often by IDV and LPV. It confers intermediate resistance to ATV but has little if any effect on LPV susceptibility. G48M is an uncommon 2-base-pair nonpolymorphic substrate-cleft mutation nearly always selected in viruses with multiple PI-resistance mutations. It has a resistance profile similar to G48V. G48A/S/T/Q/L are extremely rare nonpolymorphic PI-selected mutations nearly always selected in viruses with multiple PI-resistance mutations.
+G48SG	Major,G48V is a nonpolymorphic mutation selected by SQV and less often by IDV and LPV. It confers intermediate resistance to ATV but has little if any effect on LPV susceptibility. G48M is an uncommon 2-base-pair nonpolymorphic substrate-cleft mutation nearly always selected in viruses with multiple PI-resistance mutations. It has a resistance profile similar to G48V. G48A/S/T/Q/L are extremely rare nonpolymorphic PI-selected mutations nearly always selected in viruses with multiple PI-resistance mutations.
+G48GS	Major,G48V is a nonpolymorphic mutation selected by SQV and less often by IDV and LPV. It confers intermediate resistance to ATV but has little if any effect on LPV susceptibility. G48M is an uncommon 2-base-pair nonpolymorphic substrate-cleft mutation nearly always selected in viruses with multiple PI-resistance mutations. It has a resistance profile similar to G48V. G48A/S/T/Q/L are extremely rare nonpolymorphic PI-selected mutations nearly always selected in viruses with multiple PI-resistance mutations.
+G48T	Major,G48V is a nonpolymorphic mutation selected by SQV and less often by IDV and LPV. It confers intermediate resistance to ATV but has little if any effect on LPV susceptibility. G48M is an uncommon 2-base-pair nonpolymorphic substrate-cleft mutation nearly always selected in viruses with multiple PI-resistance mutations. It has a resistance profile similar to G48V. G48A/S/T/Q/L are extremely rare nonpolymorphic PI-selected mutations nearly always selected in viruses with multiple PI-resistance mutations.
+G48GT	Major,G48V is a nonpolymorphic mutation selected by SQV and less often by IDV and LPV. It confers intermediate resistance to ATV but has little if any effect on LPV susceptibility. G48M is an uncommon 2-base-pair nonpolymorphic substrate-cleft mutation nearly always selected in viruses with multiple PI-resistance mutations. It has a resistance profile similar to G48V. G48A/S/T/Q/L are extremely rare nonpolymorphic PI-selected mutations nearly always selected in viruses with multiple PI-resistance mutations.
+G48TG	Major,G48V is a nonpolymorphic mutation selected by SQV and less often by IDV and LPV. It confers intermediate resistance to ATV but has little if any effect on LPV susceptibility. G48M is an uncommon 2-base-pair nonpolymorphic substrate-cleft mutation nearly always selected in viruses with multiple PI-resistance mutations. It has a resistance profile similar to G48V. G48A/S/T/Q/L are extremely rare nonpolymorphic PI-selected mutations nearly always selected in viruses with multiple PI-resistance mutations.
+G48Q	Major,G48V is a nonpolymorphic mutation selected by SQV and less often by IDV and LPV. It confers intermediate resistance to ATV but has little if any effect on LPV susceptibility. G48M is an uncommon 2-base-pair nonpolymorphic substrate-cleft mutation nearly always selected in viruses with multiple PI-resistance mutations. It has a resistance profile similar to G48V. G48A/S/T/Q/L are extremely rare nonpolymorphic PI-selected mutations nearly always selected in viruses with multiple PI-resistance mutations.
+G48GQ	Major,G48V is a nonpolymorphic mutation selected by SQV and less often by IDV and LPV. It confers intermediate resistance to ATV but has little if any effect on LPV susceptibility. G48M is an uncommon 2-base-pair nonpolymorphic substrate-cleft mutation nearly always selected in viruses with multiple PI-resistance mutations. It has a resistance profile similar to G48V. G48A/S/T/Q/L are extremely rare nonpolymorphic PI-selected mutations nearly always selected in viruses with multiple PI-resistance mutations.
+G48QG	Major,G48V is a nonpolymorphic mutation selected by SQV and less often by IDV and LPV. It confers intermediate resistance to ATV but has little if any effect on LPV susceptibility. G48M is an uncommon 2-base-pair nonpolymorphic substrate-cleft mutation nearly always selected in viruses with multiple PI-resistance mutations. It has a resistance profile similar to G48V. G48A/S/T/Q/L are extremely rare nonpolymorphic PI-selected mutations nearly always selected in viruses with multiple PI-resistance mutations.
+G48L	Major,G48V is a nonpolymorphic mutation selected by SQV and less often by IDV and LPV. It confers intermediate resistance to ATV but has little if any effect on LPV susceptibility. G48M is an uncommon 2-base-pair nonpolymorphic substrate-cleft mutation nearly always selected in viruses with multiple PI-resistance mutations. It has a resistance profile similar to G48V. G48A/S/T/Q/L are extremely rare nonpolymorphic PI-selected mutations nearly always selected in viruses with multiple PI-resistance mutations.
+G48GL	Major,G48V is a nonpolymorphic mutation selected by SQV and less often by IDV and LPV. It confers intermediate resistance to ATV but has little if any effect on LPV susceptibility. G48M is an uncommon 2-base-pair nonpolymorphic substrate-cleft mutation nearly always selected in viruses with multiple PI-resistance mutations. It has a resistance profile similar to G48V. G48A/S/T/Q/L are extremely rare nonpolymorphic PI-selected mutations nearly always selected in viruses with multiple PI-resistance mutations.
+G48LG	Major,G48V is a nonpolymorphic mutation selected by SQV and less often by IDV and LPV. It confers intermediate resistance to ATV but has little if any effect on LPV susceptibility. G48M is an uncommon 2-base-pair nonpolymorphic substrate-cleft mutation nearly always selected in viruses with multiple PI-resistance mutations. It has a resistance profile similar to G48V. G48A/S/T/Q/L are extremely rare nonpolymorphic PI-selected mutations nearly always selected in viruses with multiple PI-resistance mutations.
+G48M	Major,G48V is a nonpolymorphic mutation selected by SQV and less often by IDV and LPV. It confers intermediate resistance to ATV but has little if any effect on LPV susceptibility. G48M is an uncommon 2-base-pair nonpolymorphic substrate-cleft mutation nearly always selected in viruses with multiple PI-resistance mutations. It has a resistance profile similar to G48V.
+G48GM	Major,G48V is a nonpolymorphic mutation selected by SQV and less often by IDV and LPV. It confers intermediate resistance to ATV but has little if any effect on LPV susceptibility. G48M is an uncommon 2-base-pair nonpolymorphic substrate-cleft mutation nearly always selected in viruses with multiple PI-resistance mutations. It has a resistance profile similar to G48V.
+G48MG	Major,G48V is a nonpolymorphic mutation selected by SQV and less often by IDV and LPV. It confers intermediate resistance to ATV but has little if any effect on LPV susceptibility. G48M is an uncommon 2-base-pair nonpolymorphic substrate-cleft mutation nearly always selected in viruses with multiple PI-resistance mutations. It has a resistance profile similar to G48V.
+G48V	Major,G48V is a nonpolymorphic mutation selected by SQV and less often by IDV and LPV. It confers intermediate resistance to ATV but has little if any effect on LPV susceptibility.
+G48GV	Major,G48V is a nonpolymorphic mutation selected by SQV and less often by IDV and LPV. It confers intermediate resistance to ATV but has little if any effect on LPV susceptibility.
+G48VG	Major,G48V is a nonpolymorphic mutation selected by SQV and less often by IDV and LPV. It confers intermediate resistance to ATV but has little if any effect on LPV susceptibility.
+I50L	Major,I50L is a non-polymorphic mutation selected by ATV. It causes high-level resistance to ATV and increases susceptibility to LPV and DRV.
+I50IL	Major,I50L is a non-polymorphic mutation selected by ATV. It causes high-level resistance to ATV and increases susceptibility to LPV and DRV.
+I50LI	Major,I50L is a non-polymorphic mutation selected by ATV. It causes high-level resistance to ATV and increases susceptibility to LPV and DRV.
+I50V	Major,"I50V is a nonpolymorphic mutation selected by FPV, LPV and DRV. It reduces susceptibility to LPV and DRV."
+I50IV	Major,"I50V is a nonpolymorphic mutation selected by FPV, LPV and DRV. It reduces susceptibility to LPV and DRV."
+I50VI	Major,"I50V is a nonpolymorphic mutation selected by FPV, LPV and DRV. It reduces susceptibility to LPV and DRV."
+F53LY	Accessory,"F53L is a nonpolymorphic accessory mutation selected primarily by SQV, IDV, ATV and LPV. In combination with other mutations, It is associated with reduced susceptibility to ATV and possibly LPV. F53Y is an uncommon nonpolymorphic accessory PI-selected mutation that has not been well studied."
+F53FL	Accessory,"F53L is a nonpolymorphic accessory mutation selected primarily by SQV, IDV, ATV and LPV. In combination with other mutations, It is associated with reduced susceptibility to ATV and possibly LPV. F53Y is an uncommon nonpolymorphic accessory PI-selected mutation that has not been well studied."
+F53LF	Accessory,"F53L is a nonpolymorphic accessory mutation selected primarily by SQV, IDV, ATV and LPV. In combination with other mutations, It is associated with reduced susceptibility to ATV and possibly LPV. F53Y is an uncommon nonpolymorphic accessory PI-selected mutation that has not been well studied."
+F53Y	Accessory,"F53L is a nonpolymorphic accessory mutation selected primarily by SQV, IDV, ATV and LPV. In combination with other mutations, It is associated with reduced susceptibility to ATV and possibly LPV. F53Y is an uncommon nonpolymorphic accessory PI-selected mutation that has not been well studied."
+F53FY	Accessory,"F53L is a nonpolymorphic accessory mutation selected primarily by SQV, IDV, ATV and LPV. In combination with other mutations, It is associated with reduced susceptibility to ATV and possibly LPV. F53Y is an uncommon nonpolymorphic accessory PI-selected mutation that has not been well studied."
+F53YF	Accessory,"F53L is a nonpolymorphic accessory mutation selected primarily by SQV, IDV, ATV and LPV. In combination with other mutations, It is associated with reduced susceptibility to ATV and possibly LPV. F53Y is an uncommon nonpolymorphic accessory PI-selected mutation that has not been well studied."
+F53L	Accessory,"F53L is a nonpolymorphic accessory mutation selected primarily by SQV, IDV, ATV and LPV. In combination with other mutations, It is associated with reduced susceptibility to ATV and possibly LPV. F53Y is an uncommon nonpolymorphic accessory PI-selected mutation that has not been well studied."
+I54ATS	Major,I54A/T/S are non-polymorphic PI-selected mutations that occur almost exclusively in viruses with multiple PI-resistance mutations. I54A/T/S are associated with reduced susceptibility to each of the PIs except DRV.
+I54A	Major,I54A/T/S are non-polymorphic PI-selected mutations that occur almost exclusively in viruses with multiple PI-resistance mutations. I54A/T/S are associated with reduced susceptibility to each of the PIs except DRV.
+I54IA	Major,I54A/T/S are non-polymorphic PI-selected mutations that occur almost exclusively in viruses with multiple PI-resistance mutations. I54A/T/S are associated with reduced susceptibility to each of the PIs except DRV.
+I54AI	Major,I54A/T/S are non-polymorphic PI-selected mutations that occur almost exclusively in viruses with multiple PI-resistance mutations. I54A/T/S are associated with reduced susceptibility to each of the PIs except DRV.
+I54T	Major,I54A/T/S are non-polymorphic PI-selected mutations that occur almost exclusively in viruses with multiple PI-resistance mutations. I54A/T/S are associated with reduced susceptibility to each of the PIs except DRV.
+I54IT	Major,I54A/T/S are non-polymorphic PI-selected mutations that occur almost exclusively in viruses with multiple PI-resistance mutations. I54A/T/S are associated with reduced susceptibility to each of the PIs except DRV.
+I54TI	Major,I54A/T/S are non-polymorphic PI-selected mutations that occur almost exclusively in viruses with multiple PI-resistance mutations. I54A/T/S are associated with reduced susceptibility to each of the PIs except DRV.
+I54S	Major,I54A/T/S are non-polymorphic PI-selected mutations that occur almost exclusively in viruses with multiple PI-resistance mutations. I54A/T/S are associated with reduced susceptibility to each of the PIs except DRV.
+I54IS	Major,I54A/T/S are non-polymorphic PI-selected mutations that occur almost exclusively in viruses with multiple PI-resistance mutations. I54A/T/S are associated with reduced susceptibility to each of the PIs except DRV.
+I54SI	Major,I54A/T/S are non-polymorphic PI-selected mutations that occur almost exclusively in viruses with multiple PI-resistance mutations. I54A/T/S are associated with reduced susceptibility to each of the PIs except DRV.
+I54LM	Major,"I54M/L are non-polymorphic mutations selected primarily by FPV and DRV. I54M/L reduce susceptibility to LPV, ATV, and DRV."
+I54L	Major,"I54M/L are non-polymorphic mutations selected primarily by FPV and DRV. I54M/L reduce susceptibility to LPV, ATV, and DRV."
+I54IL	Major,"I54M/L are non-polymorphic mutations selected primarily by FPV and DRV. I54M/L reduce susceptibility to LPV, ATV, and DRV."
+I54LI	Major,"I54M/L are non-polymorphic mutations selected primarily by FPV and DRV. I54M/L reduce susceptibility to LPV, ATV, and DRV."
+I54M	Major,"I54M/L are non-polymorphic mutations selected primarily by FPV and DRV. I54M/L reduce susceptibility to LPV, ATV, and DRV."
+I54IM	Major,"I54M/L are non-polymorphic mutations selected primarily by FPV and DRV. I54M/L reduce susceptibility to LPV, ATV, and DRV."
+I54MI	Major,"I54M/L are non-polymorphic mutations selected primarily by FPV and DRV. I54M/L reduce susceptibility to LPV, ATV, and DRV."
+I54V	Major,I54V is a non-polymorphic PI-selected mutation that contributes reduced susceptibility to each of the PIs except DRV.
+I54IV	Major,I54V is a non-polymorphic PI-selected mutation that contributes reduced susceptibility to each of the PIs except DRV.
+I54VI	Major,I54V is a non-polymorphic PI-selected mutation that contributes reduced susceptibility to each of the PIs except DRV.
+Q58E	Accessory,"Q58E is a minimally polymorphic accessory mutation selected by each of the PIs except DRV. In combination with other PI-resistance mutations, it may contribute to low-level ATV resistance."
+Q58QE	Accessory,"Q58E is a minimally polymorphic accessory mutation selected by each of the PIs except DRV. In combination with other PI-resistance mutations, it may contribute to low-level ATV resistance."
+Q58EQ	Accessory,"Q58E is a minimally polymorphic accessory mutation selected by each of the PIs except DRV. In combination with other PI-resistance mutations, it may contribute to low-level ATV resistance."
+A71IL	Other,"A71I/L are non-polymorphic, PI-selected accessory mutations that appear to increase the replication of viruses with other PI-resistance mutations."
+A71I	Other,"A71I/L are non-polymorphic, PI-selected accessory mutations that appear to increase the replication of viruses with other PI-resistance mutations."
+A71AI	Other,"A71I/L are non-polymorphic, PI-selected accessory mutations that appear to increase the replication of viruses with other PI-resistance mutations."
+A71IA	Other,"A71I/L are non-polymorphic, PI-selected accessory mutations that appear to increase the replication of viruses with other PI-resistance mutations."
+A71L	Other,"A71I/L are non-polymorphic, PI-selected accessory mutations that appear to increase the replication of viruses with other PI-resistance mutations."
+A71AL	Other,"A71I/L are non-polymorphic, PI-selected accessory mutations that appear to increase the replication of viruses with other PI-resistance mutations."
+A71LA	Other,"A71I/L are non-polymorphic, PI-selected accessory mutations that appear to increase the replication of viruses with other PI-resistance mutations."
+A71TV	Other,"A71V/T are polymorphic, PI-selected accessory mutations that increase the replication of viruses with other PI-resistance mutations."
+A71T	Other,"A71V/T are polymorphic, PI-selected accessory mutations that increase the replication of viruses with other PI-resistance mutations."
+A71AT	Other,"A71V/T are polymorphic, PI-selected accessory mutations that increase the replication of viruses with other PI-resistance mutations."
+A71TA	Other,"A71V/T are polymorphic, PI-selected accessory mutations that increase the replication of viruses with other PI-resistance mutations."
+A71V	Other,"A71V/T are polymorphic, PI-selected accessory mutations that increase the replication of viruses with other PI-resistance mutations."
+A71AV	Other,"A71V/T are polymorphic, PI-selected accessory mutations that increase the replication of viruses with other PI-resistance mutations."
+A71VA	Other,"A71V/T are polymorphic, PI-selected accessory mutations that increase the replication of viruses with other PI-resistance mutations."
+G73STCA	Accessory,G73S/T/C/A are common non-polymorphic accessory mutations selected primarily by most PIs. They are associated with minimally reduced susceptibility to each of the PIs.
+G73S	Accessory,G73S/T/C/A are common non-polymorphic accessory mutations selected primarily by most PIs. They are associated with minimally reduced susceptibility to each of the PIs.
+G73GS	Accessory,G73S/T/C/A are common non-polymorphic accessory mutations selected primarily by most PIs. They are associated with minimally reduced susceptibility to each of the PIs.
+G73SG	Accessory,G73S/T/C/A are common non-polymorphic accessory mutations selected primarily by most PIs. They are associated with minimally reduced susceptibility to each of the PIs.
+G73T	Accessory,G73S/T/C/A are common non-polymorphic accessory mutations selected primarily by most PIs. They are associated with minimally reduced susceptibility to each of the PIs.
+G73GT	Accessory,G73S/T/C/A are common non-polymorphic accessory mutations selected primarily by most PIs. They are associated with minimally reduced susceptibility to each of the PIs.
+G73TG	Accessory,G73S/T/C/A are common non-polymorphic accessory mutations selected primarily by most PIs. They are associated with minimally reduced susceptibility to each of the PIs.
+G73C	Accessory,G73S/T/C/A are common non-polymorphic accessory mutations selected primarily by most PIs. They are associated with minimally reduced susceptibility to each of the PIs.
+G73GC	Accessory,G73S/T/C/A are common non-polymorphic accessory mutations selected primarily by most PIs. They are associated with minimally reduced susceptibility to each of the PIs.
+G73CG	Accessory,G73S/T/C/A are common non-polymorphic accessory mutations selected primarily by most PIs. They are associated with minimally reduced susceptibility to each of the PIs.
+G73A	Accessory,G73S/T/C/A are common non-polymorphic accessory mutations selected primarily by most PIs. They are associated with minimally reduced susceptibility to each of the PIs.
+G73GA	Accessory,G73S/T/C/A are common non-polymorphic accessory mutations selected primarily by most PIs. They are associated with minimally reduced susceptibility to each of the PIs.
+G73AG	Accessory,G73S/T/C/A are common non-polymorphic accessory mutations selected primarily by most PIs. They are associated with minimally reduced susceptibility to each of the PIs.
+T74P	Accessory,"T74P is a nonpolymorphic PI-selected accessory mutation that occurs primarily in viruses from persons who have received multiple PIs. In combination with other mutations, It is associated with reduced susceptibility to ATV and DRV."
+T74TP	Accessory,"T74P is a nonpolymorphic PI-selected accessory mutation that occurs primarily in viruses from persons who have received multiple PIs. In combination with other mutations, It is associated with reduced susceptibility to ATV and DRV."
+T74PT	Accessory,"T74P is a nonpolymorphic PI-selected accessory mutation that occurs primarily in viruses from persons who have received multiple PIs. In combination with other mutations, It is associated with reduced susceptibility to ATV and DRV."
+T74S	Other,T74S is a PI-selected accessory mutation that is polymorphic in most non-B subtypes.
+T74TS	Other,T74S is a PI-selected accessory mutation that is polymorphic in most non-B subtypes.
+T74ST	Other,T74S is a PI-selected accessory mutation that is polymorphic in most non-B subtypes.
+L76V	Major,"L76V is a non-polymorphic mutation selected by IDV, LPV and DRV and reduces susceptibility to LPV and DRV."
+L76LV	Major,"L76V is a non-polymorphic mutation selected by IDV, LPV and DRV and reduces susceptibility to LPV and DRV."
+L76VL	Major,"L76V is a non-polymorphic mutation selected by IDV, LPV and DRV and reduces susceptibility to LPV and DRV."
+V82A	Major,V82A is a non-polymorphic mutation selected primarily by IDV and LPV. It is associated with reduced susceptibility to LPV and to a lesser extent ATV. It increases DRV susceptibility.
+V82VA	Major,V82A is a non-polymorphic mutation selected primarily by IDV and LPV. It is associated with reduced susceptibility to LPV and to a lesser extent ATV. It increases DRV susceptibility.
+V82AV	Major,V82A is a non-polymorphic mutation selected primarily by IDV and LPV. It is associated with reduced susceptibility to LPV and to a lesser extent ATV. It increases DRV susceptibility.
+V82C	Major,V82C is an uncommon nonpolymorphic 2-base-pair PI-selected mutation that occurs in viruses with multiple PI-resistance mutations. Its effect on PI susceptibility has not been well studied.
+V82VC	Major,V82C is an uncommon nonpolymorphic 2-base-pair PI-selected mutation that occurs in viruses with multiple PI-resistance mutations. Its effect on PI susceptibility has not been well studied.
+V82CV	Major,V82C is an uncommon nonpolymorphic 2-base-pair PI-selected mutation that occurs in viruses with multiple PI-resistance mutations. Its effect on PI susceptibility has not been well studied.
+V82F	Major,V82F is a nonpolymorphic mutation selected primarily by IDV and LPV. It reduces LPV and DRV susceptibility.
+V82VF	Major,V82F is a nonpolymorphic mutation selected primarily by IDV and LPV. It reduces LPV and DRV susceptibility.
+V82FV	Major,V82F is a nonpolymorphic mutation selected primarily by IDV and LPV. It reduces LPV and DRV susceptibility.
+V82I	Other,V82I is a highly polymorphic mutation that is not selected by PIs. It is the consensus amino acid in subtype G viruses.
+V82VI	Other,V82I is a highly polymorphic mutation that is not selected by PIs. It is the consensus amino acid in subtype G viruses.
+V82IV	Other,V82I is a highly polymorphic mutation that is not selected by PIs. It is the consensus amino acid in subtype G viruses.
+V82L	Major,V82L is a rare nonpolymorphic mutation selected primarily by TPV. Its effect on other PIs is not well characterized.
+V82VL	Major,V82L is a rare nonpolymorphic mutation selected primarily by TPV. Its effect on other PIs is not well characterized.
+V82LV	Major,V82L is a rare nonpolymorphic mutation selected primarily by TPV. Its effect on other PIs is not well characterized.
+V82M	Major,V82M is an uncommon nonpolymorphic PI-selected mutation. Its effect on currently used PIs is not well defined.
+V82VM	Major,V82M is an uncommon nonpolymorphic PI-selected mutation. Its effect on currently used PIs is not well defined.
+V82MV	Major,V82M is an uncommon nonpolymorphic PI-selected mutation. Its effect on currently used PIs is not well defined.
+V82TS	Major,"V82T/S are nonpolymorphic mutations selected primarily by IDV and LPV. They are associated with reduced susceptibility to LPV and ATV, and increased susceptibility to DRV."
+V82T	Major,"V82T/S are nonpolymorphic mutations selected primarily by IDV and LPV. They are associated with reduced susceptibility to LPV and ATV, and increased susceptibility to DRV."
+V82VT	Major,"V82T/S are nonpolymorphic mutations selected primarily by IDV and LPV. They are associated with reduced susceptibility to LPV and ATV, and increased susceptibility to DRV."
+V82TV	Major,"V82T/S are nonpolymorphic mutations selected primarily by IDV and LPV. They are associated with reduced susceptibility to LPV and ATV, and increased susceptibility to DRV."
+V82S	Major,"V82T/S are nonpolymorphic mutations selected primarily by IDV and LPV. They are associated with reduced susceptibility to LPV and ATV, and increased susceptibility to DRV."
+V82VS	Major,"V82T/S are nonpolymorphic mutations selected primarily by IDV and LPV. They are associated with reduced susceptibility to LPV and ATV, and increased susceptibility to DRV."
+V82SV	Major,"V82T/S are nonpolymorphic mutations selected primarily by IDV and LPV. They are associated with reduced susceptibility to LPV and ATV, and increased susceptibility to DRV."
+N83D	Accessory,N83D is a nonpolymorphic PI-selected accessory mutation which possibly contributes to reduced ATV susceptibility in combination with other PI-resistance mutations.
+N83ND	Accessory,N83D is a nonpolymorphic PI-selected accessory mutation which possibly contributes to reduced ATV susceptibility in combination with other PI-resistance mutations.
+N83DN	Accessory,N83D is a nonpolymorphic PI-selected accessory mutation which possibly contributes to reduced ATV susceptibility in combination with other PI-resistance mutations.
+I84AC	Major,I84A/C are extremely rare non-polymorphic mutations selected primarily by SQV. I84A is associated with markedly reduced susceptibility to each of the PIs. I84C has a less-marked effect on PI susceptibility compared with I84A.
+I84A	Major,I84A/C are extremely rare non-polymorphic mutations selected primarily by SQV. I84A is associated with markedly reduced susceptibility to each of the PIs. I84C has a less-marked effect on PI susceptibility compared with I84A.
+I84IA	Major,I84A/C are extremely rare non-polymorphic mutations selected primarily by SQV. I84A is associated with markedly reduced susceptibility to each of the PIs. I84C has a less-marked effect on PI susceptibility compared with I84A.
+I84AI	Major,I84A/C are extremely rare non-polymorphic mutations selected primarily by SQV. I84A is associated with markedly reduced susceptibility to each of the PIs. I84C has a less-marked effect on PI susceptibility compared with I84A.
+I84C	Major,I84A/C are extremely rare non-polymorphic mutations selected primarily by SQV. I84A is associated with markedly reduced susceptibility to each of the PIs. I84C has a less-marked effect on PI susceptibility compared with I84A.
+I84IC	Major,I84A/C are extremely rare non-polymorphic mutations selected primarily by SQV. I84A is associated with markedly reduced susceptibility to each of the PIs. I84C has a less-marked effect on PI susceptibility compared with I84A.
+I84CI	Major,I84A/C are extremely rare non-polymorphic mutations selected primarily by SQV. I84A is associated with markedly reduced susceptibility to each of the PIs. I84C has a less-marked effect on PI susceptibility compared with I84A.
+I84V	Major,"I84V is a nonpolymorphic substrate-cleft mutation selected by each of the PIs. I84V reduces susceptibility to LPV, ATV, and DRV."
+I84IV	Major,"I84V is a nonpolymorphic substrate-cleft mutation selected by each of the PIs. I84V reduces susceptibility to LPV, ATV, and DRV."
+I84VI	Major,"I84V is a nonpolymorphic substrate-cleft mutation selected by each of the PIs. I84V reduces susceptibility to LPV, ATV, and DRV."
+I85V	Other,"I85V is a non-polymorphic PI-selected mutation. It has minimal, if any, effects on PI susceptibility."
+I85IV	Other,"I85V is a non-polymorphic PI-selected mutation. It has minimal, if any, effects on PI susceptibility."
+I85VI	Other,"I85V is a non-polymorphic PI-selected mutation. It has minimal, if any, effects on PI susceptibility."
+N88D	Accessory,"N88D is a nonpolymorphic mutation selected by NFV, usually in combination with D30N. It is associated with potential low-level cross-resistance to ATV."
+N88ND	Accessory,"N88D is a nonpolymorphic mutation selected by NFV, usually in combination with D30N. It is associated with potential low-level cross-resistance to ATV."
+N88DN	Accessory,"N88D is a nonpolymorphic mutation selected by NFV, usually in combination with D30N. It is associated with potential low-level cross-resistance to ATV."
+N88S	Major,"N88S is a non-polymorphic mutation usually selected by NFV, ATV, and IDV. It confers high-level resistance to ATV and increases susceptibility to DRV."
+N88NS	Major,"N88S is a non-polymorphic mutation usually selected by NFV, ATV, and IDV. It confers high-level resistance to ATV and increases susceptibility to DRV."
+N88SN	Major,"N88S is a non-polymorphic mutation usually selected by NFV, ATV, and IDV. It confers high-level resistance to ATV and increases susceptibility to DRV."
+N88TG	Major,N88G/T are extremely rare non-polymorphic PI-selected mutations that reduce susceptibility to ATV.
+N88T	Major,N88G/T are extremely rare non-polymorphic PI-selected mutations that reduce susceptibility to ATV.
+N88NT	Major,N88G/T are extremely rare non-polymorphic PI-selected mutations that reduce susceptibility to ATV.
+N88TN	Major,N88G/T are extremely rare non-polymorphic PI-selected mutations that reduce susceptibility to ATV.
+N88G	Major,N88G/T are extremely rare non-polymorphic PI-selected mutations that reduce susceptibility to ATV.
+N88NG	Major,N88G/T are extremely rare non-polymorphic PI-selected mutations that reduce susceptibility to ATV.
+N88GN	Major,N88G/T are extremely rare non-polymorphic PI-selected mutations that reduce susceptibility to ATV.
+L89VT	Accessory,L89V is a nonpolymorphic accessory mutation weakly selected by each of the PIs. It appears to be minimally associated with reduced PI susceptibility. L89T is an uncommon non-polymorphic PI-selected mutation selected primarily by ATV.
+L89V	Accessory,L89V is a nonpolymorphic accessory mutation weakly selected by each of the PIs. It appears to be minimally associated with reduced PI susceptibility. L89T is an uncommon non-polymorphic PI-selected mutation selected primarily by ATV.
+L89LV	Accessory,L89V is a nonpolymorphic accessory mutation weakly selected by each of the PIs. It appears to be minimally associated with reduced PI susceptibility. L89T is an uncommon non-polymorphic PI-selected mutation selected primarily by ATV.
+L89VL	Accessory,L89V is a nonpolymorphic accessory mutation weakly selected by each of the PIs. It appears to be minimally associated with reduced PI susceptibility. L89T is an uncommon non-polymorphic PI-selected mutation selected primarily by ATV.
+L89T	Accessory,L89V is a nonpolymorphic accessory mutation weakly selected by each of the PIs. It appears to be minimally associated with reduced PI susceptibility. L89T is an uncommon non-polymorphic PI-selected mutation selected primarily by ATV.
+L89LT	Accessory,L89V is a nonpolymorphic accessory mutation weakly selected by each of the PIs. It appears to be minimally associated with reduced PI susceptibility. L89T is an uncommon non-polymorphic PI-selected mutation selected primarily by ATV.
+L89TL	Accessory,L89V is a nonpolymorphic accessory mutation weakly selected by each of the PIs. It appears to be minimally associated with reduced PI susceptibility. L89T is an uncommon non-polymorphic PI-selected mutation selected primarily by ATV.
+L90M	Major,L90M is a non-polymorphic PI-selected mutation that reduces susceptibility to ATV and to a lesser extent LPV.
+L90LM	Major,L90M is a non-polymorphic PI-selected mutation that reduces susceptibility to ATV and to a lesser extent LPV.
+L90ML	Major,L90M is a non-polymorphic PI-selected mutation that reduces susceptibility to ATV and to a lesser extent LPV.

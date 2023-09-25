@@ -1,0 +1,199 @@
+﻿
+Y115F	NRTI,Y115F causes intermediate resistance to ABC and low-level resistance to TDF.
+Y115YF	NRTI,Y115F causes intermediate resistance to ABC and low-level resistance to TDF.
+Y115FY	NRTI,Y115F causes intermediate resistance to ABC and low-level resistance to TDF.
+F116Y	NRTI,"F116Y usually occurs in combination with the multi-NRTI resistance mutation Q151M. When it occurs alone, its clinical significance is unknown."
+F116FY	NRTI,"F116Y usually occurs in combination with the multi-NRTI resistance mutation Q151M. When it occurs alone, its clinical significance is unknown."
+F116YF	NRTI,"F116Y usually occurs in combination with the multi-NRTI resistance mutation Q151M. When it occurs alone, its clinical significance is unknown."
+V118I	Other,V118I is a polymorphic accessory NRTI-resistance mutation that often occurs in combination with multiple TAMs.
+V118VI	Other,V118I is a polymorphic accessory NRTI-resistance mutation that often occurs in combination with multiple TAMs.
+V118IV	Other,V118I is a polymorphic accessory NRTI-resistance mutation that often occurs in combination with multiple TAMs.
+Q151L	NRTI,"Q151M causes intermediate/high-level resistance to AZT and ABC, and low-level resistance to TDF, 3TC and FTC. In combination with two or more accessory mutations at positions 62, 75, 77, and 116, it confers high-level resistance to AZT and ABC and intermediate resistance to TDF, 3TC and FTC. Q151L is an extremely rare transitional mutation that may precede the emergence of the Q151M."
+Q151QL	NRTI,"Q151M causes intermediate/high-level resistance to AZT and ABC, and low-level resistance to TDF, 3TC and FTC. In combination with two or more accessory mutations at positions 62, 75, 77, and 116, it confers high-level resistance to AZT and ABC and intermediate resistance to TDF, 3TC and FTC. Q151L is an extremely rare transitional mutation that may precede the emergence of the Q151M."
+Q151LQ	NRTI,"Q151M causes intermediate/high-level resistance to AZT and ABC, and low-level resistance to TDF, 3TC and FTC. In combination with two or more accessory mutations at positions 62, 75, 77, and 116, it confers high-level resistance to AZT and ABC and intermediate resistance to TDF, 3TC and FTC. Q151L is an extremely rare transitional mutation that may precede the emergence of the Q151M."
+Q151M	NRTI,"Q151M causes intermediate/high-level resistance to AZT and ABC, and low-level resistance to TDF, 3TC and FTC. In combination with two or more accessory mutations at positions 62, 75, 77, and 116, it confers high-level resistance to AZT and ABC and intermediate resistance to TDF, 3TC and FTC."
+Q151QM	NRTI,"Q151M causes intermediate/high-level resistance to AZT and ABC, and low-level resistance to TDF, 3TC and FTC. In combination with two or more accessory mutations at positions 62, 75, 77, and 116, it confers high-level resistance to AZT and ABC and intermediate resistance to TDF, 3TC and FTC."
+Q151MQ	NRTI,"Q151M causes intermediate/high-level resistance to AZT and ABC, and low-level resistance to TDF, 3TC and FTC. In combination with two or more accessory mutations at positions 62, 75, 77, and 116, it confers high-level resistance to AZT and ABC and intermediate resistance to TDF, 3TC and FTC."
+M184VI	NRTI,M184V/I cause high-level in vitro resistance to 3TC and FTC and low/intermediate resistance to ABC (3-fold reduced susceptibility). M184V/I are not contraindications to continued treatment with 3TC or FTC because they increase susceptibility to AZT and TDF and are associated with clinically significant reductions in HIV-1 replication.
+M184V	NRTI,M184V/I cause high-level in vitro resistance to 3TC and FTC and low/intermediate resistance to ABC (3-fold reduced susceptibility). M184V/I are not contraindications to continued treatment with 3TC or FTC because they increase susceptibility to AZT and TDF and are associated with clinically significant reductions in HIV-1 replication.
+M184MV	NRTI,M184V/I cause high-level in vitro resistance to 3TC and FTC and low/intermediate resistance to ABC (3-fold reduced susceptibility). M184V/I are not contraindications to continued treatment with 3TC or FTC because they increase susceptibility to AZT and TDF and are associated with clinically significant reductions in HIV-1 replication.
+M184VM	NRTI,M184V/I cause high-level in vitro resistance to 3TC and FTC and low/intermediate resistance to ABC (3-fold reduced susceptibility). M184V/I are not contraindications to continued treatment with 3TC or FTC because they increase susceptibility to AZT and TDF and are associated with clinically significant reductions in HIV-1 replication.
+M184MI	NRTI,M184V/I cause high-level in vitro resistance to 3TC and FTC and low/intermediate resistance to ABC (3-fold reduced susceptibility). M184V/I are not contraindications to continued treatment with 3TC or FTC because they increase susceptibility to AZT and TDF and are associated with clinically significant reductions in HIV-1 replication.
+M184I	NRTI,M184V/I cause high-level in vitro resistance to 3TC and FTC and low/intermediate resistance to ABC (3-fold reduced susceptibility). M184V/I are not contraindications to continued treatment with 3TC or FTC because they increase susceptibility to AZT and TDF and are associated with clinically significant reductions in HIV-1 replication.
+M184IM	NRTI,M184V/I cause high-level in vitro resistance to 3TC and FTC and low/intermediate resistance to ABC (3-fold reduced susceptibility). M184V/I are not contraindications to continued treatment with 3TC or FTC because they increase susceptibility to AZT and TDF and are associated with clinically significant reductions in HIV-1 replication.
+M184MIV	NRTI,M184V/I cause high-level in vitro resistance to 3TC and FTC and low/intermediate resistance to ABC (3-fold reduced susceptibility). M184V/I are not contraindications to continued treatment with 3TC or FTC because they increase susceptibility to AZT and TDF and are associated with clinically significant reductions in HIV-1 replication.
+M184IMV	NRTI,M184V/I cause high-level in vitro resistance to 3TC and FTC and low/intermediate resistance to ABC (3-fold reduced susceptibility). M184V/I are not contraindications to continued treatment with 3TC or FTC because they increase susceptibility to AZT and TDF and are associated with clinically significant reductions in HIV-1 replication.
+L210W	NRTI,"L210W is a TAM that usually occurs in combination with M41L and T215Y. The combination of M41, L210W and T215Y causes high-level resistance to AZT and intermediate resistance to ABC and TDF."
+L210LW	NRTI,"L210W is a TAM that usually occurs in combination with M41L and T215Y. The combination of M41, L210W and T215Y causes high-level resistance to AZT and intermediate resistance to ABC and TDF."
+L210WL	NRTI,"L210W is a TAM that usually occurs in combination with M41L and T215Y. The combination of M41, L210W and T215Y causes high-level resistance to AZT and intermediate resistance to ABC and TDF."
+T215SCDEIVALN	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215S	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215TS	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215ST	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215C	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215TC	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215CT	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215D	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215TD	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215DT	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215E	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215TE	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215ET	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215I	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215TI	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215IT	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215V	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215TV	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215VT	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215A	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215TA	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215AT	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215L	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215TL	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215LT	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215N	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215TN	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215NT	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF. T215S/C/D/E/I/V/N/A/L do not reduce NRTI susceptibility but arise from viruses that once contained T215Y/F. The presence of one of these revertant mutations suggests that the patient may have once been infected with a virus containing T215Y/F.
+T215YF	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF.
+T215Y	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF.
+T215TY	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF.
+T215YT	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF.
+T215F	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF.
+T215TF	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF.
+T215FT	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF.
+T215TISF	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF.
+T215FI	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF.
+T215IF	NRTI,T215Y/F are TAMs that causes intermediate/high-level resistance to AZT and potentially low-level resistance to ABC and TDF.
+K219EQNR	NRTI,K219E/Q/N/R are accessory TAMS that usually occur in combination with multiple other TAMs.
+K219E	NRTI,K219E/Q/N/R are accessory TAMS that usually occur in combination with multiple other TAMs.
+K219KE	NRTI,K219E/Q/N/R are accessory TAMS that usually occur in combination with multiple other TAMs.
+K219EK	NRTI,K219E/Q/N/R are accessory TAMS that usually occur in combination with multiple other TAMs.
+K219Q	NRTI,K219E/Q/N/R are accessory TAMS that usually occur in combination with multiple other TAMs.
+K219KQ	NRTI,K219E/Q/N/R are accessory TAMS that usually occur in combination with multiple other TAMs.
+K219QK	NRTI,K219E/Q/N/R are accessory TAMS that usually occur in combination with multiple other TAMs.
+K219N	NRTI,K219E/Q/N/R are accessory TAMS that usually occur in combination with multiple other TAMs.
+K219KN	NRTI,K219E/Q/N/R are accessory TAMS that usually occur in combination with multiple other TAMs.
+K219NK	NRTI,K219E/Q/N/R are accessory TAMS that usually occur in combination with multiple other TAMs.
+K219R	NRTI,K219E/Q/N/R are accessory TAMS that usually occur in combination with multiple other TAMs.
+K219KR	NRTI,K219E/Q/N/R are accessory TAMS that usually occur in combination with multiple other TAMs.
+K219RK	NRTI,K219E/Q/N/R are accessory TAMS that usually occur in combination with multiple other TAMs.
+K219W	NRTI,K219E/Q/N/R are accessory TAMS that usually occur in combination with multiple other TAMs. K219W is an uncommon NRTI-selected mutation.
+K219KW	NRTI,K219E/Q/N/R are accessory TAMS that usually occur in combination with multiple other TAMs. K219W is an uncommon NRTI-selected mutation.
+K219WK	NRTI,K219E/Q/N/R are accessory TAMS that usually occur in combination with multiple other TAMs. K219W is an uncommon NRTI-selected mutation.
+E40F	NRTI,"E40F is a non-polymorphic accessory mutation selected by AZT and d4T. It usually occurs in combination with M41L, L210W and T215Y. In this context it is associated with reduced susceptibility to each of the NRTIs."
+E40EF	NRTI,"E40F is a non-polymorphic accessory mutation selected by AZT and d4T. It usually occurs in combination with M41L, L210W and T215Y. In this context it is associated with reduced susceptibility to each of the NRTIs."
+E40FE	NRTI,"E40F is a non-polymorphic accessory mutation selected by AZT and d4T. It usually occurs in combination with M41L, L210W and T215Y. In this context it is associated with reduced susceptibility to each of the NRTIs."
+M41L	NRTI,"M41L is a TAM that usually occurs with T215Y. In combination, M41L plus T215Y confer intermediate / high-level resistance to AZT and d4T and contribute to reduced ddI, ABC and TDF susceptibility."
+M41ML	NRTI,"M41L is a TAM that usually occurs with T215Y. In combination, M41L plus T215Y confer intermediate / high-level resistance to AZT and d4T and contribute to reduced ddI, ABC and TDF susceptibility."
+M41LM	NRTI,"M41L is a TAM that usually occurs with T215Y. In combination, M41L plus T215Y confer intermediate / high-level resistance to AZT and d4T and contribute to reduced ddI, ABC and TDF susceptibility."
+E44AD	NRTI,E44D is a relatively non-polymorphic accessory mutation; E44A is a nonpolymorphic accessory mutation. Each usually occurs with multiple TAMs.
+E44D	NRTI,E44D is a relatively non-polymorphic accessory mutation; E44A is a nonpolymorphic accessory mutation. Each usually occurs with multiple TAMs.
+E44ED	NRTI,E44D is a relatively non-polymorphic accessory mutation; E44A is a nonpolymorphic accessory mutation. Each usually occurs with multiple TAMs.
+E44DE	NRTI,E44D is a relatively non-polymorphic accessory mutation; E44A is a nonpolymorphic accessory mutation. Each usually occurs with multiple TAMs.
+E44A	NRTI,E44D is a relatively non-polymorphic accessory mutation; E44A is a nonpolymorphic accessory mutation. Each usually occurs with multiple TAMs.
+E44EA	NRTI,E44D is a relatively non-polymorphic accessory mutation; E44A is a nonpolymorphic accessory mutation. Each usually occurs with multiple TAMs.
+E44AE	NRTI,E44D is a relatively non-polymorphic accessory mutation; E44A is a nonpolymorphic accessory mutation. Each usually occurs with multiple TAMs.
+A62V	NRTI,A62V is an accessory mutation that often occurs in combination with the multi-NRTI resistance mutations K65R or Q151M. A62V is widespread in subtype A viruses in former Soviet Union countries but A62 is otherwise non-polymorphic.
+A62AV	NRTI,A62V is an accessory mutation that often occurs in combination with the multi-NRTI resistance mutations K65R or Q151M. A62V is widespread in subtype A viruses in former Soviet Union countries but A62 is otherwise non-polymorphic.
+A62VA	NRTI,A62V is an accessory mutation that often occurs in combination with the multi-NRTI resistance mutations K65R or Q151M. A62V is widespread in subtype A viruses in former Soviet Union countries but A62 is otherwise non-polymorphic.
+K65E	NRTI,"K65R confers intermediate reductions in susceptibility to TDF, ABC, and 3TC/FTC. It increases AZT susceptibility. K65E is an extremely rare NRTI-selected mutation with markedly reduced replication fitness. Its effect on NRTI susceptibility is uncertain."
+K65KE	NRTI,"K65R confers intermediate reductions in susceptibility to TDF, ABC, and 3TC/FTC. It increases AZT susceptibility. K65E is an extremely rare NRTI-selected mutation with markedly reduced replication fitness. Its effect on NRTI susceptibility is uncertain."
+K65EK	NRTI,"K65R confers intermediate reductions in susceptibility to TDF, ABC, and 3TC/FTC. It increases AZT susceptibility. K65E is an extremely rare NRTI-selected mutation with markedly reduced replication fitness. Its effect on NRTI susceptibility is uncertain."
+K65N	NRTI,"K65R confers intermediate reductions in susceptibility to TDF, ABC, and 3TC/FTC. It increases AZT susceptibility. K65N appears to have reduced replication compared with K65R."
+K65KN	NRTI,"K65R confers intermediate reductions in susceptibility to TDF, ABC, and 3TC/FTC. It increases AZT susceptibility. K65N appears to have reduced replication compared with K65R."
+K65NK	NRTI,"K65R confers intermediate reductions in susceptibility to TDF, ABC, and 3TC/FTC. It increases AZT susceptibility. K65N appears to have reduced replication compared with K65R."
+K65R	NRTI,"K65R confers intermediate reductions in susceptibility to TDF, ABC, and 3TC/FTC. It increases AZT susceptibility. In NRTI-experienced, INSTI-naive patients with K65R, TDF+3TC+DTG is usually highly effective and more effective than AZT/3TC/DTG. However, in patients receiving TDF+3TC+DTG, there is a risk of emergent DTG resistance that does not arise in NRTI-naive patients receiving TDF+3TC+DTG."
+K65KR	NRTI,"K65R confers intermediate reductions in susceptibility to TDF, ABC, and 3TC/FTC. It increases AZT susceptibility. In NRTI-experienced, INSTI-naive patients with K65R, TDF+3TC+DTG is usually highly effective and more effective than AZT/3TC/DTG. However, in patients receiving TDF+3TC+DTG, there is a risk of emergent DTG resistance that does not arise in NRTI-naive patients receiving TDF+3TC+DTG."
+K65RK	NRTI,"K65R confers intermediate reductions in susceptibility to TDF, ABC, and 3TC/FTC. It increases AZT susceptibility. In NRTI-experienced, INSTI-naive patients with K65R, TDF+3TC+DTG is usually highly effective and more effective than AZT/3TC/DTG. However, in patients receiving TDF+3TC+DTG, there is a risk of emergent DTG resistance that does not arise in NRTI-naive patients receiving TDF+3TC+DTG."
+D67GESTH	NRTI,D67N is a non-polymorphic TAM associated with low-level resistance to AZT. D67G/E/S/T/H are non-polymorphic NRTI-selected mutations that generally occur in viruses with multiple TAMs.
+D67G	NRTI,D67N is a non-polymorphic TAM associated with low-level resistance to AZT. D67G/E/S/T/H are non-polymorphic NRTI-selected mutations that generally occur in viruses with multiple TAMs.
+D67DG	NRTI,D67N is a non-polymorphic TAM associated with low-level resistance to AZT. D67G/E/S/T/H are non-polymorphic NRTI-selected mutations that generally occur in viruses with multiple TAMs.
+D67GD	NRTI,D67N is a non-polymorphic TAM associated with low-level resistance to AZT. D67G/E/S/T/H are non-polymorphic NRTI-selected mutations that generally occur in viruses with multiple TAMs.
+D67E	NRTI,D67N is a non-polymorphic TAM associated with low-level resistance to AZT. D67G/E/S/T/H are non-polymorphic NRTI-selected mutations that generally occur in viruses with multiple TAMs.
+D67DE	NRTI,D67N is a non-polymorphic TAM associated with low-level resistance to AZT. D67G/E/S/T/H are non-polymorphic NRTI-selected mutations that generally occur in viruses with multiple TAMs.
+D67ED	NRTI,D67N is a non-polymorphic TAM associated with low-level resistance to AZT. D67G/E/S/T/H are non-polymorphic NRTI-selected mutations that generally occur in viruses with multiple TAMs.
+D67S	NRTI,D67N is a non-polymorphic TAM associated with low-level resistance to AZT. D67G/E/S/T/H are non-polymorphic NRTI-selected mutations that generally occur in viruses with multiple TAMs.
+D67DS	NRTI,D67N is a non-polymorphic TAM associated with low-level resistance to AZT. D67G/E/S/T/H are non-polymorphic NRTI-selected mutations that generally occur in viruses with multiple TAMs.
+D67SD	NRTI,D67N is a non-polymorphic TAM associated with low-level resistance to AZT. D67G/E/S/T/H are non-polymorphic NRTI-selected mutations that generally occur in viruses with multiple TAMs.
+D67T	NRTI,D67N is a non-polymorphic TAM associated with low-level resistance to AZT. D67G/E/S/T/H are non-polymorphic NRTI-selected mutations that generally occur in viruses with multiple TAMs.
+D67DT	NRTI,D67N is a non-polymorphic TAM associated with low-level resistance to AZT. D67G/E/S/T/H are non-polymorphic NRTI-selected mutations that generally occur in viruses with multiple TAMs.
+D67TD	NRTI,D67N is a non-polymorphic TAM associated with low-level resistance to AZT. D67G/E/S/T/H are non-polymorphic NRTI-selected mutations that generally occur in viruses with multiple TAMs.
+D67H	NRTI,D67N is a non-polymorphic TAM associated with low-level resistance to AZT. D67G/E/S/T/H are non-polymorphic NRTI-selected mutations that generally occur in viruses with multiple TAMs.
+D67DH	NRTI,D67N is a non-polymorphic TAM associated with low-level resistance to AZT. D67G/E/S/T/H are non-polymorphic NRTI-selected mutations that generally occur in viruses with multiple TAMs.
+D67HD	NRTI,D67N is a non-polymorphic TAM associated with low-level resistance to AZT. D67G/E/S/T/H are non-polymorphic NRTI-selected mutations that generally occur in viruses with multiple TAMs.
+D67N	NRTI,D67N is a non-polymorphic TAM associated with low-level resistance to AZT.
+D67DN	NRTI,D67N is a non-polymorphic TAM associated with low-level resistance to AZT.
+D67ND	NRTI,D67N is a non-polymorphic TAM associated with low-level resistance to AZT.
+S68G	NRTI,S68G is a polymorphic mutation that is often selected in combination with K65R. It partially restores the replication defect associated with K65R.
+S68SG	NRTI,S68G is a polymorphic mutation that is often selected in combination with K65R. It partially restores the replication defect associated with K65R.
+S68GS	NRTI,S68G is a polymorphic mutation that is often selected in combination with K65R. It partially restores the replication defect associated with K65R.
+T69D	NRTI,"T69D is a nonpolymorphic mutation selected by early NRTIs that does not appear to reduce AZT, ABC, or TDF susceptibility."
+T69TD	NRTI,"T69D is a nonpolymorphic mutation selected by early NRTIs that does not appear to reduce AZT, ABC, or TDF susceptibility."
+T69DT	NRTI,"T69D is a nonpolymorphic mutation selected by early NRTIs that does not appear to reduce AZT, ABC, or TDF susceptibility."
+T69G	NRTI,T69G is a rare non-polymorphic mutation that usually occurs in viruses with a deletion at codon 67 and multiple other NRTI-resistance mutations.
+T69TG	NRTI,T69G is a rare non-polymorphic mutation that usually occurs in viruses with a deletion at codon 67 and multiple other NRTI-resistance mutations.
+T69GT	NRTI,T69G is a rare non-polymorphic mutation that usually occurs in viruses with a deletion at codon 67 and multiple other NRTI-resistance mutations.
+T69NSAIE	Other,T69N/S/A/I/E are relatively non-polymorphic mutations weakly selected in persons receiving NRTIs. They may minimally contribute reduced AZT susceptibility.
+T69N	Other,T69N/S/A/I/E are relatively non-polymorphic mutations weakly selected in persons receiving NRTIs. They may minimally contribute reduced AZT susceptibility.
+T69TN	Other,T69N/S/A/I/E are relatively non-polymorphic mutations weakly selected in persons receiving NRTIs. They may minimally contribute reduced AZT susceptibility.
+T69NT	Other,T69N/S/A/I/E are relatively non-polymorphic mutations weakly selected in persons receiving NRTIs. They may minimally contribute reduced AZT susceptibility.
+T69S	Other,T69N/S/A/I/E are relatively non-polymorphic mutations weakly selected in persons receiving NRTIs. They may minimally contribute reduced AZT susceptibility.
+T69TS	Other,T69N/S/A/I/E are relatively non-polymorphic mutations weakly selected in persons receiving NRTIs. They may minimally contribute reduced AZT susceptibility.
+T69ST	Other,T69N/S/A/I/E are relatively non-polymorphic mutations weakly selected in persons receiving NRTIs. They may minimally contribute reduced AZT susceptibility.
+T69A	Other,T69N/S/A/I/E are relatively non-polymorphic mutations weakly selected in persons receiving NRTIs. They may minimally contribute reduced AZT susceptibility.
+T69TA	Other,T69N/S/A/I/E are relatively non-polymorphic mutations weakly selected in persons receiving NRTIs. They may minimally contribute reduced AZT susceptibility.
+T69AT	Other,T69N/S/A/I/E are relatively non-polymorphic mutations weakly selected in persons receiving NRTIs. They may minimally contribute reduced AZT susceptibility.
+T69I	Other,T69N/S/A/I/E are relatively non-polymorphic mutations weakly selected in persons receiving NRTIs. They may minimally contribute reduced AZT susceptibility.
+T69TI	Other,T69N/S/A/I/E are relatively non-polymorphic mutations weakly selected in persons receiving NRTIs. They may minimally contribute reduced AZT susceptibility.
+T69IT	Other,T69N/S/A/I/E are relatively non-polymorphic mutations weakly selected in persons receiving NRTIs. They may minimally contribute reduced AZT susceptibility.
+T69E	Other,T69N/S/A/I/E are relatively non-polymorphic mutations weakly selected in persons receiving NRTIs. They may minimally contribute reduced AZT susceptibility.
+T69TE	Other,T69N/S/A/I/E are relatively non-polymorphic mutations weakly selected in persons receiving NRTIs. They may minimally contribute reduced AZT susceptibility.
+T69ET	Other,T69N/S/A/I/E are relatively non-polymorphic mutations weakly selected in persons receiving NRTIs. They may minimally contribute reduced AZT susceptibility.
+K70EGQNST	NRTI,K70/E/Q/N/T/S/G cause low-leve resistance to ABC and TDF.
+K70E	NRTI,K70/E/Q/N/T/S/G cause low-leve resistance to ABC and TDF.
+K70KE	NRTI,K70/E/Q/N/T/S/G cause low-leve resistance to ABC and TDF.
+K70EK	NRTI,K70/E/Q/N/T/S/G cause low-leve resistance to ABC and TDF.
+K70G	NRTI,K70/E/Q/N/T/S/G cause low-leve resistance to ABC and TDF.
+K70KG	NRTI,K70/E/Q/N/T/S/G cause low-leve resistance to ABC and TDF.
+K70GK	NRTI,K70/E/Q/N/T/S/G cause low-leve resistance to ABC and TDF.
+K70Q	NRTI,K70/E/Q/N/T/S/G cause low-leve resistance to ABC and TDF.
+K70KQ	NRTI,K70/E/Q/N/T/S/G cause low-leve resistance to ABC and TDF.
+K70QK	NRTI,K70/E/Q/N/T/S/G cause low-leve resistance to ABC and TDF.
+K70N	NRTI,K70/E/Q/N/T/S/G cause low-leve resistance to ABC and TDF.
+K70KN	NRTI,K70/E/Q/N/T/S/G cause low-leve resistance to ABC and TDF.
+K70NK	NRTI,K70/E/Q/N/T/S/G cause low-leve resistance to ABC and TDF.
+K70S	NRTI,K70/E/Q/N/T/S/G cause low-leve resistance to ABC and TDF.
+K70KS	NRTI,K70/E/Q/N/T/S/G cause low-leve resistance to ABC and TDF.
+K70SK	NRTI,K70/E/Q/N/T/S/G cause low-leve resistance to ABC and TDF.
+K70T	NRTI,K70/E/Q/N/T/S/G cause low-leve resistance to ABC and TDF.
+K70KT	NRTI,K70/E/Q/N/T/S/G cause low-leve resistance to ABC and TDF.
+K70TK	NRTI,K70/E/Q/N/T/S/G cause low-leve resistance to ABC and TDF.
+K70R	NRTI,K70R is a TAM that confers intermediate resistance to AZT and contributes to reduced ABC and TDF susceptibility in combination with other TAMs.
+K70KR	NRTI,K70R is a TAM that confers intermediate resistance to AZT and contributes to reduced ABC and TDF susceptibility in combination with other TAMs.
+K70RK	NRTI,K70R is a TAM that confers intermediate resistance to AZT and contributes to reduced ABC and TDF susceptibility in combination with other TAMs.
+L74VI	NRTI,L74V causes intermediate ABC resistance. L74I causes low-level ABC resistance.
+L74V	NRTI,L74V causes intermediate ABC resistance. L74I causes low-level ABC resistance.
+L74LV	NRTI,L74V causes intermediate ABC resistance. L74I causes low-level ABC resistance.
+L74VL	NRTI,L74V causes intermediate ABC resistance. L74I causes low-level ABC resistance.
+L74I	NRTI,L74V causes intermediate ABC resistance. L74I causes low-level ABC resistance.
+L74LI	NRTI,L74V causes intermediate ABC resistance. L74I causes low-level ABC resistance.
+L74IL	NRTI,L74V causes intermediate ABC resistance. L74I causes low-level ABC resistance.
+V75I	NRTI,"V75I is a relatively non-polymorphic accessory mutation that often occurs in combination with the multi-NRTI resistance mutation Q151M. When it occurs alone, its clinical significance is uncertain."
+V75VI	NRTI,"V75I is a relatively non-polymorphic accessory mutation that often occurs in combination with the multi-NRTI resistance mutation Q151M. When it occurs alone, its clinical significance is uncertain."
+V75IV	NRTI,"V75I is a relatively non-polymorphic accessory mutation that often occurs in combination with the multi-NRTI resistance mutation Q151M. When it occurs alone, its clinical significance is uncertain."
+V75MTAS	NRTI,"V75T/M/A/S are nonpolymorphic accessory NRTI-selected mutations. They appear to have minimal phenotypic effects on AZT, ABC, and TDF."
+V75M	NRTI,"V75T/M/A/S are nonpolymorphic accessory NRTI-selected mutations. They appear to have minimal phenotypic effects on AZT, ABC, and TDF."
+V75VM	NRTI,"V75T/M/A/S are nonpolymorphic accessory NRTI-selected mutations. They appear to have minimal phenotypic effects on AZT, ABC, and TDF."
+V75MV	NRTI,"V75T/M/A/S are nonpolymorphic accessory NRTI-selected mutations. They appear to have minimal phenotypic effects on AZT, ABC, and TDF."
+V75T	NRTI,"V75T/M/A/S are nonpolymorphic accessory NRTI-selected mutations. They appear to have minimal phenotypic effects on AZT, ABC, and TDF."
+V75VT	NRTI,"V75T/M/A/S are nonpolymorphic accessory NRTI-selected mutations. They appear to have minimal phenotypic effects on AZT, ABC, and TDF."
+V75TV	NRTI,"V75T/M/A/S are nonpolymorphic accessory NRTI-selected mutations. They appear to have minimal phenotypic effects on AZT, ABC, and TDF."
+V75A	NRTI,"V75T/M/A/S are nonpolymorphic accessory NRTI-selected mutations. They appear to have minimal phenotypic effects on AZT, ABC, and TDF."
+V75VA	NRTI,"V75T/M/A/S are nonpolymorphic accessory NRTI-selected mutations. They appear to have minimal phenotypic effects on AZT, ABC, and TDF."
+V75AV	NRTI,"V75T/M/A/S are nonpolymorphic accessory NRTI-selected mutations. They appear to have minimal phenotypic effects on AZT, ABC, and TDF."
+V75S	NRTI,"V75T/M/A/S are nonpolymorphic accessory NRTI-selected mutations. They appear to have minimal phenotypic effects on AZT, ABC, and TDF."
+V75VS	NRTI,"V75T/M/A/S are nonpolymorphic accessory NRTI-selected mutations. They appear to have minimal phenotypic effects on AZT, ABC, and TDF."
+V75SV	NRTI,"V75T/M/A/S are nonpolymorphic accessory NRTI-selected mutations. They appear to have minimal phenotypic effects on AZT, ABC, and TDF."
+F77L	NRTI,"F77L usually occurs in combination with the multi-NRTI resistance mutation Q151M. When it occurs alone, its clinical significance is uncertain."
+F77FL	NRTI,"F77L usually occurs in combination with the multi-NRTI resistance mutation Q151M. When it occurs alone, its clinical significance is uncertain."
+F77LF	NRTI,"F77L usually occurs in combination with the multi-NRTI resistance mutation Q151M. When it occurs alone, its clinical significance is uncertain."
