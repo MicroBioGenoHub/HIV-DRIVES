@@ -122,7 +122,7 @@ This pipeline was written by a collaborative effort between Stephen Kanyerezi [K
 
 This softwares' foundation is built using pre-existing tools. When using it, please don't forget to cite the following:
 - [Bowtie2](https://github.com/BenLangmead/bowtie2)
-- 
+- [Minimap2=2.1](https://github.com/lh3/minimap2)
 - [Pip](https://pypi.org/project/pip/)
 - [r-base=4.1.1](https://www.r-project.org/)
   + [r-rmarkdown=2.14](https://cran.r-project.org/web/packages/rmarkdown/index.html)
@@ -134,8 +134,13 @@ This softwares' foundation is built using pre-existing tools. When using it, ple
 - [Quasitools=0.7.0](https://github.com/phac-nml/quasitools)
 - [Samtools](https://github.com/samtools/samtools)
 - [Sierralocal](https://github.com/PoonLab/sierra-local)
-- [Trim-galore](https://github.com/FelixKrueger/TrimGalore)
+- [Trim-galore=0.6.10](https://github.com/FelixKrueger/TrimGalore)
 
+### 🐛 To report bugs, ask questions or seek help
+
+The software developing team works round the clock to ensure the bugs within the program are captured and fixed.
+For support or any inquiry:
+You can submit your query using the [Issue Tracker](https://github.com/GunzIvan28/rMAP/issues)
 
 
 
