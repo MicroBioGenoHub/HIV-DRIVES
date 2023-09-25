@@ -6,7 +6,7 @@
 ####unique_output_dir	R1	R2	layout
 #example1	pathRead1_1.fastq.gz	pathRead2_2.fastq.gz	paired
 
-# enter your data below following the above format
+# enter your data below following the above format. Don't include the # at the beginning
 
 
 
@@ -22,4 +22,4 @@
 #example2  pathRead.fastq.gz   se
 
 
-# enter your data below following the above format
+# enter your data below following the above format. Don't include the # at the beginning
