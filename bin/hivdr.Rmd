@@ -1,0 +1,88 @@
+---
+title: "PatientID: output_id"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: pdf_document
+header-includes:
+  - \usepackage{titling}
+  - \pretitle{\begin{flushleft}}
+  - \posttitle{\end{flushleft}}
+  - \predate{\begin{flushleft}\large}
+  - \postdate{\end{flushleft}}
+warning: FALSE
+---
+
+```{r load-packages, echo=FALSE, warning=FALSE, message=FALSE, CACHE = TRUE}
+library(dplyr)
+library(knitr)
+library(kableExtra)
+library(tidyr)
+```
+
+```{r load-data, echo=FALSE, warning=FALSE, message=FALSE, results='hide', CACHE = TRUE}
+res_drug <- read.csv("resistance profile", header = T)
+drugs <- read.csv("~/HIV-DRIVES/databases/drug_names_rmd.csv")
+comments <- read.csv("comments profile", sep = "\t", header = T)
+```
+
+## Color Code
+
+\begin{minipage}{0.7\textwidth}
+\raggedright
+\textcolor{red}{\rule{0.3cm}{0.3cm}} HR: High-Level Resistance \quad
+\textcolor{blue}{\rule{0.3cm}{0.3cm}} PLR: Potential Low-Level Resistance \quad
+\textcolor{orange}{\rule{0.3cm}{0.3cm}} LR: Low-Level Resistance \quad
+\textcolor{pink}{\rule{0.3cm}{0.3cm}} IR: Intermediate Resistance \\
+\textcolor{green}{\rule{0.3cm}{0.3cm}} S: Susceptible \quad
+\end{minipage}
+
+```{r process, echo=FALSE, warning=FALSE, message=FALSE, CACHE = TRUE}
+res_drug_col <- res_drug %>%
+  mutate(RESISTANCE.PROFILE = cell_spec(RESISTANCE.PROFILE, background = ifelse(RESISTANCE.PROFILE == "S", "green",
+                                                                                ifelse(RESISTANCE.PROFILE == "PLR", "blue",
+                                                                                       ifelse(RESISTANCE.PROFILE == "LR", "orange",
+                                                                                              ifelse(RESISTANCE.PROFILE == "IR", "pink",
+                                                                                                     ifelse(RESISTANCE.PROFILE == "HR", "red", "purple"))))), bold = T))
+res_drug_col <- res_drug_col %>% mutate_all(~ifelse(is.na(.), "", as.character(.)))
+# 
+kable(res_drug_col, escape = F, align = "cccl", longtable = T) %>%
+  kable_styling(latex_options = c("scale_down")) %>%
+  kable_styling(latex_options = "HOLD_position") %>%
+  row_spec(0, bold = T) %>%
+  column_spec(1, bold = T) %>%
+  column_spec(1, border_left = T) %>%
+  column_spec(4, border_right = T) %>%
+  collapse_rows(columns = c(1,4))
+```
+
+\newpage
+
+# Appendix
+
+## Drug abbreviations in full
+
+```{r drugs, echo=FALSE, warning=FALSE, message=FALSE, CACHE = TRUE}
+drugs <- drugs %>% mutate_all(~ifelse(is.na(.), "", as.character(.)))
+kable(drugs, align = "ccc", longtable = T) %>% 
+  kable_styling(latex_options = c("scale_down")) %>%
+  kable_styling(latex_options = "HOLD_position") %>%
+  row_spec(0, bold = T) %>%
+  column_spec(1, bold = T) %>%
+  column_spec(1, border_left = T) %>%
+  column_spec(3, border_right = T) %>%
+  collapse_rows(columns = 1)
+```
+
+## Comments
+
+```{r comments, echo=FALSE, warning=FALSE, message=FALSE, CACHE = TRUE}
+comments <- comments %>% mutate_all(~ifelse(is.na(.), "", as.character(.)))
+kable(comments, align = "cl", longtable = T) %>% 
+  kable_styling(latex_options = c("scale_down")) %>%
+  kable_styling(latex_options = "HOLD_position") %>%
+  row_spec(0, bold = T) %>%
+  column_spec(1, bold = T) %>%
+  column_spec(1, border_left = T) %>%
+  column_spec(2, border_right = T) %>%
+  column_spec(2, width = "40em") %>% 
+  collapse_rows(columns = 1)
+```

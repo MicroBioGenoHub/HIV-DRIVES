@@ -1,0 +1,1956 @@
+#!/usr/bin/env bash
+# link all helper scripts
+. "$CONDA_PREFIX/etc/profile.d/conda.sh" # enable activation of the conda environment within script
+
+conda activate base
+
+pref_conda=$(echo $CONDA_PREFIX)
+
+HIVDIR="${pref_conda}/envs/HIV-DRIVES"
+mutations="${HIVDIR}/accessories/databases"
+
+### Required arguments
+output_dir="" # outout directory
+forward_read="" # forward read
+reverse_read="" # reverse read
+single_end=false # single ended read
+xml=$(find ${HIVDIR}/accessories/algorithm/data -type f -name "HIVDB*.xml") # HIV algorithm xml
+alignment="post" # choose between postalign and nucamino
+consensus="" # consensus file
+json="${HIVDIR}/accessories/algorithm/data/apobec_drms.json" # path of APOBEC mutations
+update=true # update the sierralocal program
+varcall=false # variant call option: This runs the quasi script
+all=false # This runs the whole pipeline
+resistance=false # resistance profiling
+cores=16 # get number of cpus to use
+se="" # single end read name
+sanger="" # sanger ab1 file
+version="1.0"
+
+usage() {
+#    echo -e ${Cyan}
+    cat <<EOF
+This is HIV-DRIVES $version
+Developed and maintained by Stephen Kanyerezi, Ivan Sserwadda & Gerald Mboowa
+
+Synopsis:
+	HIV-DRIVES enables one to do HIV Drug Resistance Identification, Variant Evaluation, and Surveillance
+
+Usage: 
+	Given paired reads, to run the whole pipeline; HIV-DRIVES [options] -f <path of forward read> -r <path of reverse read> -o <output directory to be created> --all true
+	Given paired reads, to perform variant calling and generate a consensus genome; HIV-DRIVES [options] -r <path of reverse read> -o <output directory to be created> --varcall true
+	Given single ended reads, to run the whole pipeline; HIV-DRIVES [options] -o <output directory to be created> --single-end true --se <path of single ended read> --all true
+	Given single ended reads, to perform variant calling and generate a consensus genome; HIV-DRIVES [options] -o <output directory to be created> --single-end true --se <path of single ended read> --varcall true
+
+General:
+	-h/--help       Show this help menu
+	-v/--version    Print version and exit
+	-x/--citation   Show citation and exit
+
+Mandatory options for paired reads:
+	-f/--forward-read	Path of the forward reads [either .fastq or .fastq.gz]
+
+	-r/--reverse-read	Path of the reverse reads [either .fastq or .fastq.gz]
+
+	-s/--single-end		[true or false (default)] Set to true if single ended reads
+
+	--se	                Path of single end read. Applicable if --single-end set to true
+
+	--consensus		Path of fasta file from which to perform resistance profiling as well as variants detection. Applicable if you only have consensus genomes
+
+	-o/--output-dir	        Directory to be created for results
+
+	--all	                [true or false (default)] Run the whole pipeline to generate variants, consensus genome, and resistance profiles. Applicable if --varcall not set to true
+
+	--varcall	        [true or false (default)] Genrate variants and consensus genome. Applicable if --all not set to true
+
+	--resistance		[true or false (default)] Perform resistance profiling as well as variants detection. Applicable only with --consensus option and if --varcall and --all not set to true
+
+Other options:
+	--xml			Path of HIV algorithm xml file to be used
+
+	--alignment		[post or nuc (default)] amino acid aligner to be used. Either postalign or nucamino
+
+	--json			Path of APOEBEC mutations file
+
+	--update		[true or false (default)] update the HIV algorithm and APOEBEC mutations
+
+	--cores			Number of cpus to use. Default=4
+                     
+For further explanation please visit: https://github.com/Kanyerezi30/HIV-DRIVES
+EOF
+#    echo -e ${Off}
+}
+
+if [ $# == 0 ]; then
+    usage
+    exit 1
+fi
+
+while [[ $# -gt 0 ]]
+do
+        case "$1" in
+                --output-dir|-o)
+                        output_dir="$2"
+                        shift 2
+                        ;;
+                --forward-read|-f)
+                        forward_read="$2"
+                        shift 2
+                        ;;
+                --reverse-read|-r)
+                        reverse_read="$2"
+                        shift 2
+                        ;;
+                --single-end|-s)
+                        single_end=true
+                        shift 2
+                        ;;
+		--se)
+			se="$2"
+			shift 2
+			;;
+		--xml)
+			xml="$2"
+			shift 2
+			;;
+		--alignment)
+			alignment="$2"
+			shift 2
+			;;
+		--consensus)
+			consensus="$2"
+			shift 2
+			;;
+		--json)
+			json="$2"
+			shift 2
+			;;
+		--update)
+			update=false
+			shift 2
+			;;
+		--varcall)
+			varcall=true
+			shift 2
+			;;
+		--all)
+			all=true
+			shift 2
+			;;
+		--resistance)
+			resistance=true
+			shift 2
+			;;
+		--cores)
+			cores="$2"
+			shift 2
+			;;
+    		-h|--help)
+        		usage
+        		exit 1
+        		;;
+		--sanger)
+			sanger=$2
+			shift 2
+			;;
+    		-v|--version)
+        		echo "This is HIV-DRIVES version $version"
+        		exit 1
+        		;;
+    		-x|--citation)
+        		echo -e "\nIf using HIV-DRIVES, please cite:"
+			echo -e "HIV-DRIVES: HIV Drug Resistance Identification, Variant Evaluation, and Surveillance\nsierra-local: A lightweight standalone application for drug resistance prediction. Jasper C Ho, Garway T Ng, Mathias Renaud, Art FY Poon, (2019). Journal of Open Source Software, 4(33), 1186, https://doi.org/10.21105/joss.01186\nhttps://github.com/phac-nml/quasitools"
+        		exit 1
+        		;;
+                *)
+                        echo "Invalid option: $1" >&2
+			usage
+                        exit 1
+                        ;;
+	esac
+done
+
+# Validate required options
+if [[ -z $output_dir ]]
+then
+        echo "Missing output directory" >&2
+        usage
+        exit 1
+fi
+
+# update the HIV algorithm and apobec mutations
+if [[ "$update" = true ]]
+then
+	conda activate HIV-DRIVES
+	rm ${HIVDIR}/accessories/algorithm/data/HIVDB*.xml
+	${pref_conda}/envs/HIV-DRIVES/bin/python3 ${HIVDIR}/accessories/algorithm/updater.py
+	xml=$(find ${HIVDIR}/accessories/algorithm/data -type f -name "HIVDB*.xml")
+	json="${HIVDIR}/accessories/algorithm/data/apobec_drms.json"
+fi
+
+cp ${HIVDIR}/accessories/bin/drug_score_level.R .
+
+if [ "$all" = true ]
+then
+	if [ "$single_end" = true ]
+	then
+		if [ -z "$se" ]
+		then
+			echo "Missing required options: --se" >&2
+			usage
+			exit 1
+		
+		elif [ -n "$se" ]
+		then
+        		# Single-ended reads logic
+			echo "========================Read trimming $se==========================="
+			conda activate HIV-DRIVES
+			output=$(echo $output_dir | sed 's;/$;;' | awk -F"/" '{print $NF}')
+			ID=$(echo $output | awk -F"/" '{print $NF}') # get identifier
+			mkdir -p ${output}/tmp
+			se1=$(echo $se | awk -F"/" '{print $NF}') # get the read name
+			cp $se ${output}/tmp/ # copy se to tmp dir
+			trim_galore -q 28 --cores $cores --dont_gzip ${output}/tmp/$se1 --output_dir ${output}/tmp # qc with trim_galore
+                	echo "===========================Variant calling and consensus generation==================================="
+                	se2="*trimmed.fq"
+                	mkdir -p ${output}/{patient_reads,patient_free_reads} # create directories to store patient and patient free reads
+                	conda activate ${pref_conda}/envs/HIV-DRIVES/quasi
+                	bowtie2 -p $cores -x ${HIVDIR}/accessories/data/reference/GRCh38_noalt_as/GRCh38_noalt_as -U ${output}/tmp/$se2 -S ${output}/${ID}_mapped_and_unmapped.sam
+                	samtools view -bS ${output}/${ID}_mapped_and_unmapped.sam | samtools fastq -f 4 -F 256 -@ $cores - -n > ${output}/patient_free_reads/${ID}_host_removed.fastq
+                        samtools view -bS ${output}/${ID}_mapped_and_unmapped.sam | samtools fastq -F 4 -F 256 -@ $cores - -n > ${output}/patient_reads/${ID}_host.fastq
+			rm ${output}/${ID}_mapped_and_unmapped.sam
+			rm -rf ${output}/tmp
+                	se2="${ID}_host_removed.fastq"
+                	mkdir -p ${output}/results/hydra_output
+                	quasitools hydra --min_dp 50 --min_ac 5 --min_variant_qual 30  ${output}/patient_free_reads/$se2 -o ${output}/results/hydra_output -gc
+			gzip ${output}/patient_free_reads/*
+			gzip ${output}/patient_reads/*
+			sed -i "s/>.*/>$output/" ${output}/results/hydra_output/consensus.fasta
+			if [ ! -s "${output}/results/hydra_output/consensus.fasta" ]
+			then
+				echo "No consensus generated"
+				echo "${output},No consensus generated" > ${output}/results/consenus_status.csv
+				exit 1
+			fi
+                	echo "=================================Subtype detection and resistance profiling======================================="
+                	conda activate HIV-DRIVES
+                	consensus="${output}/results/hydra_output/consensus.fasta"
+                	mkdir -p ${output}/results/sierralocal_output
+                	if [[ -z "$xml" && -z "$alignment" && -z "$json" ]]
+                	then
+                        	sierralocal $consensus -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                	elif [[ -n "$xml" && -z "$alignment" && -z "$json" ]]
+                	then
+                        	sierralocal $consensus -xml $xml -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                	elif [[ -z "$xml" && -n "$alignment" && -z "$json" ]]
+                	then
+                        	sierralocal $consensus -alignment $alignment -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                	elif [[ -z $xml && -z $alignment && -n $json ]]
+                	then
+                        	sierralocal $consensus -json $json -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                	elif [[ -n "$xml" && -n "$alignment" && -z "$json" ]]
+                	then
+                        	sierralocal $consensus -xml $xml -alignment $alignment -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                	elif [[ -n "$xml" && -z "$alignment" && -n "$json" ]]
+                	then
+                        	sierralocal $consensus -xml $xml -json $json -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                	elif [[ -z "$xml" && -n "$alignment" && -n "$json" ]]
+                	then
+                        	sierralocal $consensus -alignment $alignment -json $json -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                	elif [[ -n "$xml" && -n "$alignment" && -n "$json" ]]
+                	then
+                        	sierralocal $consensus -xml $xml -alignment $alignment -json $json -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                	fi
+                	Rscript drug_score_level.R $PWD $output
+                	id=$output
+
+                	mkdir -p ${output}/results/json
+
+                	echo -e "#Mutation\tFilter\tFrequency\tINFO\tCategory" > ${id}_mutation_frequency.csv
+
+                	grep -v "#" ${output}/results/hydra_output/mutation_report.aavf | awk '{print $4$3$5"\t"$6"\t"$7*100"\t"$9}'| awk 'BEGIN {OFS=FS="\t"} {if($4 ~ "=Accessory" || $4 ~ "=Major") $5 = "INSTI"; else if($4 ~ "PIMinor" || $4 ~ "PIMajor") $5 = "PI"; else if($4 ~ "=NNRTI") $5 = "NNRTI"; else if($4 ~ "=NRTI") $5 = "NRTI"}1' >> ${id}_mutation_frequency.csv
+
+                	sed -i 's/D4T/DFT/g' ${output}_drug_score_resistance.csv
+                	sed -i 's/D4T/DFT/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+
+                	echo -e "{" > ${output}/results/json/${output}_lab_dr_report.json
+
+                	grep -B 1 primaryType ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -A 1 text | grep text | sort -u | cut -f2 -d":" | sed 's/ //; s/,//; s/"//g' > ${output}_mut_freq.csv
+    
+                	conda activate HIV-DRIVES
+                	#subtype=$(python3 ${pref_conda}/envs/HIV-DRIVES/lib/python3.9/site-packages/sierralocal/subtyper.py -alignment $alignment  ${output}/results/hydra_output/consensus.fasta | tail -1 | cut -f2)
+			subtype=""
+
+                	genesanalysed=$(grep -A 1 gene ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep name | cut -f2 -d":" | sed 's/,//' | sort -u | tr "\n" ","  | sed 's/,$/\n/' | sed 's/"//g')
+
+                	echo -e "\"Subtype\":\"$subtype\",\n\"Genes.Analysed\":\"$genesanalysed\"," >> ${output}/results/json/${output}_lab_dr_report.json # add subtype and genes analysed
+
+                	echo -e "\"data\":[" >> ${output}/results/json/${output}_lab_dr_report.json
+
+                	for i in $(cut -f3 -d"," ${output}_drug_score_resistance.csv | grep -v Drug | sed 's/"//g') # access the drug names
+                	do
+                        	dclass=$(grep -w $i ${output}_drug_score_resistance.csv | cut -f2 -d"," | sed 's/"//g') # create drug class
+                        	dname=$(grep -w $i ${HIVDIR}/accessories/databases/drug_names.csv | cut -f2 -d",") # create drug name
+                        	dcode=$i
+                        	dresistancelevel=$(grep -w $i ${output}_drug_score_resistance.csv | cut -f5 -d",") # create resistance level
+                        	dscore=$(grep -w $i ${output}_drug_score_resistance.csv | cut -f4 -d",") # create the score
+#                       	grep -C 5 score ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -E "\"text\": \"[A-Z][0-9]{1,5}[A-Z]{1,2}\"|\"score\"|\"name\"" | sed -n "/$i/,/[A-Z]\{3\}/p" | grep -v name | sed '1d; s/,//; s/"//g' | cut -f2 -d":" | awk 'ORS=NR%2?"\t":"\n"' | sort -u | cut -f1 | sed 's/ //g' > ${output}_mut_freq.csv
+#                       	above=$(grep -f ${output}_mut_freq.csv ${output}_mutation_frequency.csv | awk -v var="$dclass" '$5 == var' | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+#                        	grep -f ${output}_mut_freq.csv ${output}_mutation_frequency.csv | awk -v var="$dclass" '$5 == var' | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/' >> ${output}_${dclass}_above.csv
+                        	echo -e "   {" >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e "     \"Drug.Class\":\"$dclass\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e "     \"Drug.Name\":\"$dname\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e "     \"Code\":\"$dcode\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e "     \"Resistance.level\":$dresistancelevel," >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e "     \"score\":$dscore" >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e "   }," >> ${output}/results/json/${output}_lab_dr_report.json
+                	done
+
+                	echo -e " ]," >> ${output}/results/json/${output}_lab_dr_report.json
+                	#piabove=$(cat ${output}_PI_above.csv | sed 's/,/\n/g' | sort -u | sed -z 's/\n/,/g; s/,$/\n/')
+	                #nrtiabove=$(cat ${output}_NRTI_above.csv | sed 's/,/\n/g' | sort -u | sed -z 's/\n/,/g; s/,$/\n/')
+        	        #nnrtiabove=$(cat ${output}_NNRTI_above.csv | sed 's/,/\n/g' | sort -u | sed -z 's/\n/,/g; s/,$/\n/')
+                	#instiabove=$(cat ${output}_INSTI_above.csv | sed 's/,/\n/g' | sort -u | sed -z 's/\n/,/g; s/,$/\n/')
+                	pimajor=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/pi_drms.csv | sed -z 's/\n/,/g; s/,$/\n/') #grep -f - ${output}_mutation_frequency.csv  | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+                	piaccessory=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/pi_drms.csv | sed -z 's/\n/,/g; s/,$/\n/') #grep -f - ${output}_mutation_frequency.csv  | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+                	piother=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Other | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | sed -z 's/\n/,/g; s/,$/\n/') #grep -f - ${output}_mutation_frequency.csv  | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+                	nrtimut=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 NRTI | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/nrti_drms.csv | sed -z 's/\n/,/g; s/,$/\n/') #grep -f - ${output}_mutation_frequency.csv  | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+                	nnrtimut=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 NNRTI | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/nnrti_drms.csv | sed -z 's/\n/,/g; s/,$/\n/') #grep -f - ${output}_mutation_frequency.csv  | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+                	rtother=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 Other | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | sed -z 's/\n/,/g; s/,$/\n/') #grep -f - ${output}_mutation_frequency.csv  | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+                	inmajor=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/insti_drms.csv | sed -z 's/\n/,/g; s/,$/\n/') #grep -f - ${output}_mutation_frequency.csv  | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+			inaccessory=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/insti_drms.csv | sed -z 's/\n/,/g; s/,$/\n/') #grep -f - ${output}_mutation_frequency.csv  | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+			inother=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Other | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | sed -z 's/\n/,/g; s/,$/\n/') #grep -f - ${output}_mutation_frequency.csv  | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+
+## add the above mutations to the json
+			echo -e " \"Major.Mutations\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+			echo -e "   \"pi.major.mutations\":\"$pimajor\"," >> ${output}/results/json/${output}_lab_dr_report.json
+			echo -e "   \"pi.accessory.mutations\":\"$piaccessory\"," >> ${output}/results/json/${output}_lab_dr_report.json
+			echo -e "   \"nrti.mutations\":\"$nrtimut\"," >> ${output}/results/json/${output}_lab_dr_report.json
+			echo -e "   \"nnrti.mutations\":\"$nnrtimut\"," >> ${output}/results/json/${output}_lab_dr_report.json
+			echo -e "   \"insti.major.mutations\":\"$inmajor\"," >> ${output}/results/json/${output}_lab_dr_report.json
+			echo -e "   \"insti.accessory.mutations\":\"$inaccesory\"" >> ${output}/results/json/${output}_lab_dr_report.json
+			echo -e " }," >> ${output}/results/json/${output}_lab_dr_report.json
+
+## add the below mutations to the json
+			echo -e " \"Minor.Mutations\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+			echo -e "   \"piother.mutations\":\"$piother\"," >> ${output}/results/json/${output}_lab_dr_report.json
+			echo -e "   \"rtother.mutations\":\"$rtother\"," >> ${output}/results/json/${output}_lab_dr_report.json
+			echo -e "   \"instiother.mutations\":\"$inother\"" >> ${output}/results/json/${output}_lab_dr_report.json
+			echo -e " }," >> ${output}/results/json/${output}_lab_dr_report.json	                
+
+# create comments
+			echo "=========================comments for $output===================================="
+			grep -C 3 comments ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -E "text|type" | cut -f2 -d":" | sed 's/,$//' | awk 'ORS=NR%3?"\t":"\n"' > ${output}_comments.csv # create comments for the sample from sierralocal json output
+
+## create comments for rt
+			touch ${output}_nnrti.csv
+			echo "===create nnrti for $output============="
+			cat ${output}_comments.csv | awk '$2=="\"NNRTI\""' | cut -f3 | sort -u | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$//' > ${output}_nnrti.csv
+
+			touch ${output}_nrti.csv
+			echo "===create nrti for $output============="
+			cat ${output}_comments.csv | awk '$2=="\"NRTI\""' | cut -f3 | sort -u | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$//' > ${output}_nrti.csv
+
+## create comments for pi and insti
+			touch ${output}_pimajor.csv
+			touch ${output}_piaccessory.csv
+			touch ${output}_instimajor.csv
+			touch ${output}_instiaccessory.csv
+
+## major
+			for m in $(cat ${output}_comments.csv | awk '$2=="\"Major\""' | sort -u | cut -f1 | sed 's/"//g; s/ //')
+			do
+			dclass=$(grep -w $m ${output}/results/json/${output}_lab_dr_report.json | cut -f1 -d"." | sed 's/"//' | sed 's/   //') # get class
+			if  [ "$dclass" == "pi" ] # is it a pi
+			then
+			echo "========pimajor for $output================="
+			awk -v var="$m" '$1 ~ var' ${output}_comments.csv | cut -f3 | sort -u | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_pimajor.csv
+			elif [ "$dclass" == "insti" ] # is it an insti
+			then
+			echo "========instimajor for $output============="
+			awk -v var="$m" '$i ~ var' ${output}_comments.csv | cut -f3 | sort -u | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_instimajor.csv
+			fi
+			done
+
+
+## accessory
+			for n in $(cat ${output}_comments.csv | awk '$2=="\"Accessory\""' | sort -u | cut -f1 | sed 's/"//g; s/ //')
+			do
+			dclass2=$(grep -w $n ${output}/results/json/${output}_lab_dr_report.json | cut -f1 -d"." | sed 's/"//' | sed 's/   //') # get class
+			if  [ $dclass2 == "pi" ] # is it a pi
+			then
+			echo "==========piaccessory==============="
+			awk -v var="$n" '$1 ~ var' ${output}_comments.csv | cut -f3 | sort -u | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_piaccessory.csv
+			elif [ $dclass2 == "insti" ] # is it an insti
+			then
+			echo "=========instiaccessory==========="
+			awk -v var="$n" '$i ~ var' ${output}_comments.csv | cut -f3 | sort -u | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_instiaccessory.csv
+			fi
+			done
+
+			#NEW COMMENTS EXTRACTION
+			##PI
+			touch ${output}_pi_mutsmajor.csv
+			echo "xxx" > ${output}_pi_mutsmajor.csv
+			touch ${output}_pi_mutsaccessory.csv
+			echo "xxx" > ${output}_pi_mutsaccessory.csv
+			sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/pi_drms.csv >> ${output}_pi_mutsmajor.csv
+			sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/pi_drms.csv >> ${output}_pi_mutsaccessory.csv
+
+			rm ${output}_pimajor.csv
+			touch ${output}_pimajor.csv
+			for i in $(cat ${output}_pi_mutsmajor.csv)
+			do
+				sed -n "/^$i\t/p" ${mutations}/pi_comments.csv
+			done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_pimajor.csv
+
+			rm ${output}_piaccessory.csv
+			touch ${output}_piaccessory.csv
+			for i in $(cat ${output}_pi_mutsaccessory.csv)
+			do
+				sed -n "/^$i\t/p" ${mutations}/pi_comments.csv
+			done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_piaccessory.csv
+
+			##INSTI
+			touch ${output}_insti_mutsmajor.csv
+			echo "xxx" > ${output}_insti_mutsmajor.csv
+			touch ${output}_insti_mutsaccessory.csv
+                        echo "xxx" > ${output}_insti_mutsaccessory.csv
+			sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/insti_drms.csv >> ${output}_insti_mutsmajor.csv
+			sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/insti_drms.csv >> ${output}_insti_mutsaccessory.csv
+
+                        rm ${output}_instimajor.csv
+                        touch ${output}_instimajor.csv
+                        for i in $(cat ${output}_insti_mutsmajor.csv)
+                        do
+                                sed -n "/^$i\t/p" ${mutations}/insti_comments.csv
+                        done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_instimajor.csv
+
+                        rm ${output}_instiaccessory.csv
+                        touch ${output}_instiaccessory.csv
+                        for i in $(cat ${output}_insti_mutsaccessory.csv)
+                        do
+                                sed -n "/^$i\t/p" ${mutations}/insti_comments.csv
+                        done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_instiaccessory.csv
+			
+			##NRTI
+			touch ${output}_nrti_mutsmajor.csv
+			echo "xxx" > ${output}_nrti_mutsmajor.csv
+			sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 NRTI | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/nrti_drms.csv >> ${output}_nrti_mutsmajor.csv
+
+                        rm ${output}_nrti.csv
+                        touch ${output}_nrti.csv
+                        for i in $(cat ${output}_nrti_mutsmajor.csv)
+                        do
+                                sed -n "/^$i\t/p" ${mutations}/nrti_comments.csv
+                        done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_nrti.csv
+
+			##NNRTI
+                        touch ${output}_nnrti_mutsmajor.csv
+                        echo "xxx" > ${output}_nnrti_mutsmajor.csv
+			sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 NNRTI | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/nnrti_drms.csv >> ${output}_nnrti_mutsmajor.csv
+			
+                        rm ${output}_nnrti.csv
+                        touch ${output}_nnrti.csv
+                        for i in $(cat ${output}_nnrti_mutsmajor.csv)
+                        do
+                                sed -n "/^$i\t/p" ${mutations}/nnrti_comments.csv
+                        done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_nnrti.csv
+
+######################################################################################################################################################
+			### Add the comments to the json
+                	echo -e " \"comments\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+                	##### Add RT comments
+                	echo "==============add rt comments================="
+                	echo -e " \"rt\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e "   \"nnrti\":\"$(cat ${output}_nnrti.csv)\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e "   \"nrti\":\"$(cat ${output}_nrti.csv)\"" >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e " }," >> ${output}/results/json/${output}_lab_dr_report.json
+
+                	###### Add PI comments
+                	echo "===========add pi comments==============="
+                	echo -e " \"pi\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e "   \"major\":\"$(cat ${output}_pimajor.csv)\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e "   \"accessory\":\"$(cat ${output}_piaccessory.csv)\"" >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e " }," >> ${output}/results/json/${output}_lab_dr_report.json
+	                ##### Add INSTI comments
+        	        echo "====================add insti comments============"
+                	echo -e " \"insti\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e "   \"major\":\"$(cat ${output}_instimajor.csv)\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e "   \"accessory\":\"$(cat ${output}_instiaccessory.csv)\"" >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e " }" >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e "}," >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e " \"runDetails\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e "   \"amplified\": "true"," >> ${output}/results/json/${output}_lab_dr_report.json # add amplification
+                	echo -e "   \"testDate\":\"$(date +%F" "%T)\"" >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e "  }\n}" >> ${output}/results/json/${output}_lab_dr_report.json
+
+
+                	echo "==============making final json for $output====================="
+                	sed -i 's/DFT/D4T/g' ${output}/results/json/${output}_lab_dr_report.json # convert DFT back to DFT
+                	cat ${output}/results/json/${output}_lab_dr_report.json | sed -z 's/,\n ]/\n ]/; s/|"/"/' > ${output}/results/json/${output}.json
+                	rm ${output}/results/json/${output}_lab_dr_report.json
+
+                	## Create pdf report
+                	echo "DRUG CLASS,DRUG,RESISTANCE PROFILE,DRMS above 20 percent prevalence" > ${output}/results/json/${output}_res.csv # create header for the resistance profile
+                	for i in $(grep -A3 "Drug.Class" ${output}/results/json/${output}.json | grep -v Name | cut -f2 -d":" | grep -v "\-\-" |   awk 'ORS=NR%3?"\t":"\n"' | sed 's/"//g; s/,//g; s/\t/,/g' | cut -f1 -d",")
+                	do
+                        	mut=$(grep -A6 Major.Mutations ${output}/results/json/${output}.json | grep -i -w "$i" | cut -f2 -d":" | sed 's/"//g' | sed 's/,$//' | sed -z 's/\n/#/g; s/#$/\n/; s/#/,/g' | sed 's/,$//')
+                        	echo $mut
+                	done | sed 's/,/;/g' > ${output}/results/json/${output}_mutations.csv ## Create a list of mutations
+                	grep -A3 "Drug.Class" ${output}/results/json/${output}.json | grep -v Name | cut -f2 -d":" | grep -v "\-\-" |   awk 'ORS=NR%3?"\t":"\n"' | sed 's/Susceptible/S/; s/Potential Low-Level Resistance/PLR/; s/Low-Level Resistance/LR/; s/Intermediate Resistance/IR/; s/High-Level Resistance/HR/' | sed 's/"//g; s/,//g; s/\t/,/g' | paste -d"," - ${output}/results/json/${output}_mutations.csv | sed -E 's/\([0-9]+(\.[0-9]+)?%\)//g'  >> ${output}/results/json/${output}_res.csv ## add resistance profiles together with the mutations
+
+                	## create comments file
+                	echo -e "DRUG CLASS\tCOMMENTS" > ${output}/results/json/${output}_comments_drugs.csv ## add header
+
+                	### PI
+                	grep -A 11 comments ${output}/results/json/${output}.json | grep -w -A 2 pi | grep -E "major|accessory" | cut -f2- -d":" | sed 's/"//g; s/|$//' | sed 's/|/\n/g; s/,$//' | sort -u > ${output}/results/json/${output}_pi.csv
+                	pi=$(cat ${output}/results/json/${output}_pi.csv | wc -l)
+                	for i in $(seq 1 $pi)
+                	do
+                        	echo PI >> ${output}/results/json/${output}_PI_com
+                	done
+                	paste ${output}/results/json/${output}_PI_com ${output}/results/json/${output}_pi.csv >> ${output}/results/json/${output}_comments_drugs.csv
+
+                	### NRTI
+                	grep -A 11 comments ${output}/results/json/${output}.json | grep -w "\"nrti\"" | cut -f2- -d":" | sed 's/"//g; s/|$//' | sed 's/|/\n/g; s/,$//' | sort -u > ${output}/results/json/${output}_nrti.csv
+                	nrti=$(cat ${output}/results/json/${output}_nrti.csv | wc -l)
+                	for i in $(seq 1 $nrti)
+                	do
+                        	echo NRTI >> ${output}/results/json/${output}_NRTI_com
+                	done
+                	paste ${output}/results/json/${output}_NRTI_com ${output}/results/json/${output}_nrti.csv >> ${output}/results/json/${output}_comments_drugs.csv
+
+                	### NNRTI
+                	grep -A 11 comments ${output}/results/json/${output}.json | grep -w "\"nnrti\"" | cut -f2- -d":" | sed 's/"//g; s/|$//' | sed 's/|/\n/g; s/,$//' | sort -u > ${output}/results/json/${output}_nnrti.csv
+                	nnrti=$(cat ${output}/results/json/${output}_nnrti.csv | wc -l)
+                	for i in $(seq 1 $nnrti)
+                	do
+                        	echo NNRTI >> ${output}/results/json/${output}_NNRTI_com
+                	done
+                	paste ${output}/results/json/${output}_NNRTI_com ${output}/results/json/${output}_nnrti.csv >> ${output}/results/json/${output}_comments_drugs.csv
+
+                	### INSTI
+                	grep -A 11 comments ${output}/results/json/${output}.json | grep -w -A 2 insti | grep -E "major|accessory" | cut -f2- -d":" | sed 's/"//g; s/|$//' | sed 's/|/\n/g; s/,$//' | sort -u > ${output}/results/json/${output}_insti.csv
+                	insti=$(cat ${output}/results/json/${output}_insti.csv | wc -l)
+                	for i in $(seq 1 $insti)
+                	do
+                        	echo INSTI >> ${output}/results/json/${output}_INSTI_com
+                	done
+                	paste ${output}/results/json/${output}_INSTI_com ${output}/results/json/${output}_insti.csv >> ${output}/results/json/${output}_comments_drugs.csv
+
+                	## Create appropriate Rmd
+                	cp ${HIVDIR}/accessories/bin/hivdr.Rmd ${output}.Rmd
+                	sed -i "s;output_id;$output;" ${output}.Rmd
+                	sed -i "s;resistance profile;${output}/results/json/${output}_res.csv;" ${output}.Rmd
+                	sed -i "s;comments profile;${output}/results/json/${output}_comments_drugs.csv;" ${output}.Rmd
+
+                	cp ${HIVDIR}/accessories/bin/pdf.R render_pdf.R
+                	sed -i "s;copy;$output;" render_pdf.R
+                	Rscript render_pdf.R
+			mv ${output}/results/hydra_output/consensus.fasta ${output}/results/${output}.fasta
+			mv ${output}/results/hydra_output/hydra.vcf ${output}/results/${output}.vcf
+			mv ${output}/results/hydra_output/mutation_report.aavf ${output}/results/${output}.aavf
+			mv ${output}.pdf ${output}/results/
+			rm ${output}.Rmd
+			rm -rf ${output}/results/hydra_output
+			rm -rf ${output}/results/sierralocal_output
+			cut -f1-3 -d"," ${output}/results/json/${output}_res.csv > ${output}/results/${output}_res.csv
+			cut -f1,4 -d"," ${output}/results/json/${output}_res.csv | sort -u > ${output}/results/${output}_drms20.csv
+			rm render_pdf.R
+			rm -rf ${output}/results/json
+                	## remove the created csv files at the end of the run
+                	rm *csv
+
+		fi
+	else
+		if [ -z "$forward_read" ] || [ -z "$reverse_read" ]
+		then
+               		echo "Missing required options: --forward-read|-f or --reverse-read|-r" >&2
+               		usage
+			exit 1
+        	fi
+
+        	echo "========================Read trimming $output_dir==========================="
+        	conda activate HIV-DRIVES
+        	output=$(echo $output_dir | sed 's;/$;;' | awk -F"/" '{print $NF}')
+        	ID=$(echo $output | awk -F"/" '{print $NF}') # get identifier
+        	mkdir -p ${output}/tmp
+        	R1=$(echo $forward_read | awk -F"/" '{print $NF}') # get the forward file name
+        	R2=$(echo $reverse_read | awk -F"/" '{print $NF}') # get the reverse file name
+        	cp $forward_read ${output}/tmp/ # copy R1 to tmp dir
+        	cp $reverse_read ${output}/tmp/ # copy R2 to tmp dir
+        	trim_galore -q 28 --cores $cores --dont_gzip --paired ${output}/tmp/$R1 ${output}/tmp/$R2 --output_dir ${output}/tmp # qc with trim_galore
+        	echo "===========================Variant calling and consensus generation==================================="
+        	R3="*_val_1.fq"
+        	R4="*_val_2.fq"
+        	mkdir -p ${output}/{patient_reads,patient_free_reads} # create directories to store patient and patient free reads
+        	conda activate ${pref_conda}/envs/HIV-DRIVES/quasi
+        	bowtie2 -p $cores -x ${HIVDIR}/accessories/data/reference/GRCh38_noalt_as/GRCh38_noalt_as -1 ${output}/tmp/$R3 -2 ${output}/tmp/$R4 -S ${output}/${ID}_mapped_and_unmapped.sam
+        	samtools view -bS ${output}/${ID}_mapped_and_unmapped.sam | samtools fastq -f 12 -F 256 -@ $cores - -1 ${output}/patient_free_reads/${ID}_host_removed_R1.fastq -2  ${output}/patient_free_reads/${ID}_host_removed_R2.fastq -0 /dev/null -s /dev/null -n
+        	samtools view -bS ${output}/${ID}_mapped_and_unmapped.sam | samtools fastq -F 12 -F 256 -@ $cores - -1 ${output}/patient_reads/${ID}_host_R1.fastq -2  ${output}/patient_reads/${ID}_host_R2.fastq -0 /dev/null -s /dev/null -n
+		rm ${output}/${ID}_mapped_and_unmapped.sam
+		rm -rf ${output}/tmp
+        	R3="${ID}_host_removed_R1.fastq"
+        	R4="${ID}_host_removed_R2.fastq"
+        	mkdir -p ${output}/results/hydra_output
+        	quasitools hydra --min_dp 50 --min_ac 5 --min_variant_qual 30  ${output}/patient_free_reads/$R3 ${output}/patient_free_reads/$R4 -o ${output}/results/hydra_output -gc
+      		gzip ${output}/patient_free_reads/*
+      		gzip ${output}/patient_reads/*
+		sed -i "s/>.*/>$output/" ${output}/results/hydra_output/consensus.fasta
+                if [ ! -s "${output}/results/hydra_output/consensus.fasta" ]
+                then
+                        echo "No consensus generated"
+                        echo "${output},No consensus generated" > ${output}/results/consenus_status.csv
+                        exit 1
+                fi 
+		echo "=================================Subtype detection and resistance profiling======================================="
+		conda activate HIV-DRIVES
+		consensus="${output}/results/hydra_output/consensus.fasta"
+        	mkdir -p ${output}/results/sierralocal_output
+        	if [[ -z "$xml" && -z "$alignment" && -z "$json" ]]
+        	then
+                	sierralocal $consensus -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+        	elif [[ -n "$xml" && -z "$alignment" && -z "$json" ]]
+        	then
+                	sierralocal $consensus -xml $xml -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+        	elif [[ -z "$xml" && -n "$alignment" && -z "$json" ]]
+        	then
+                	sierralocal $consensus -alignment $alignment -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+        	elif [[ -z "$xml" && -z "$alignment" && -n "$json" ]]
+        	then
+                	sierralocal $consensus -json $json -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+        	elif [[ -n "$xml" && -n "$alignment" && -z "$json" ]]
+        	then
+                	sierralocal $consensus -xml $xml -alignment $alignment -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+        	elif [[ -n "$xml" && -z "$alignment" && -n "$json" ]]
+        	then
+                	sierralocal $consensus -xml $xml -json $json -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+        	elif [[ -z "$xml" && -n "$alignment" && -n "$json" ]]
+        	then
+                	sierralocal $consensus -alignment $alignment -json $json -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+        	elif [[ -n "$xml" && -n "$alignment" && -n "$json" ]]
+        	then
+                	sierralocal $consensus -xml $xml -alignment $alignment -json $json -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+        	fi
+		Rscript drug_score_level.R $PWD $output
+		id=$output
+
+		mkdir -p ${output}/results/json
+
+		echo -e "#Mutation\tFilter\tFrequency\tINFO\tCategory" > ${id}_mutation_frequency.csv
+
+		grep -v "#" ${output}/results/hydra_output/mutation_report.aavf | awk '{print $4$3$5"\t"$6"\t"$7*100"\t"$9}'| awk 'BEGIN {OFS=FS="\t"} {if($4 ~ "=Accessory" || $4 ~ "=Major") $5 = "INSTI"; else if($4 ~ "PIMinor" || $4 ~ "PIMajor") $5 = "PI"; else if($4 ~ "=NNRTI") $5 = "NNRTI"; else if($4 ~ "=NRTI") $5 = "NRTI"}1' >> ${id}_mutation_frequency.csv
+
+		sed -i 's/D4T/DFT/g' ${output}_drug_score_resistance.csv
+		sed -i 's/D4T/DFT/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+
+		echo -e "{" > ${output}/results/json/${output}_lab_dr_report.json
+
+		grep -B 1 primaryType ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -A 1 text | grep text | sort -u | cut -f2 -d":" | sed 's/ //; s/,//; s/"//g' > ${output}_mut_freq.csv
+	
+		conda activate HIV-DRIVES
+		#subtype=$(python3 ${pref_conda}/envs/HIV-DRIVES/lib/python3.9/site-packages/sierralocal/subtyper.py -alignment $alignment  ${output}/results/hydra_output/consensus.fasta | tail -1 | cut -f2)
+		subtype=""
+
+		genesanalysed=$(grep -A 1 gene ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep name | cut -f2 -d":" | sed 's/,//' | sort -u | tr "\n" ","  | sed 's/,$/\n/' | sed 's/"//g')
+
+		echo -e "\"Subtype\":\"$subtype\",\n\"Genes.Analysed\":\"$genesanalysed\"," >> ${output}/results/json/${output}_lab_dr_report.json # add subtype and genes analysed
+
+		echo -e "\"data\":[" >> ${output}/results/json/${output}_lab_dr_report.json
+
+		for i in $(cut -f3 -d"," ${output}_drug_score_resistance.csv | grep -v Drug | sed 's/"//g') # access the drug names
+		do
+        		dclass=$(grep -w $i ${output}_drug_score_resistance.csv | cut -f2 -d"," | sed 's/"//g') # create drug class
+        		dname=$(grep -w $i ${HIVDIR}/accessories/databases/drug_names.csv | cut -f2 -d",") # create drug name
+        		dcode=$i
+        		dresistancelevel=$(grep -w $i ${output}_drug_score_resistance.csv | cut -f5 -d",") # create resistance level
+        		dscore=$(grep -w $i ${output}_drug_score_resistance.csv | cut -f4 -d",") # create the score
+#        		grep -C 5 score ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -E "\"text\": \"[A-Z][0-9]{1,5}[A-Z]{1,2}\"|\"score\"|\"name\"" | sed -n "/$i/,/[A-Z]\{3\}/p" | grep -v name | sed '1d; s/,//; s/"//g' | cut -f2 -d":" | awk 'ORS=NR%2?"\t":"\n"' | sort -u | cut -f1 | sed 's/ //g' > ${output}_mut_freq.csv
+#        		above=$(grep -f ${output}_mut_freq.csv ${output}_mutation_frequency.csv | awk -v var="$dclass" '$5 == var' | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+#        		grep -f ${output}_mut_freq.csv ${output}_mutation_frequency.csv | awk -v var="$dclass" '$5 == var' | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/' >> ${output}_${dclass}_above.csv
+        		echo -e "   {" >> ${output}/results/json/${output}_lab_dr_report.json
+        		echo -e "     \"Drug.Class\":\"$dclass\"," >> ${output}/results/json/${output}_lab_dr_report.json
+        		echo -e "     \"Drug.Name\":\"$dname\"," >> ${output}/results/json/${output}_lab_dr_report.json
+        		echo -e "     \"Code\":\"$dcode\"," >> ${output}/results/json/${output}_lab_dr_report.json
+        		echo -e "     \"Resistance.level\":$dresistancelevel," >> ${output}/results/json/${output}_lab_dr_report.json
+        		echo -e "     \"score\":$dscore" >> ${output}/results/json/${output}_lab_dr_report.json
+        		echo -e "   }," >> ${output}/results/json/${output}_lab_dr_report.json
+		done
+
+		echo -e " ]," >> ${output}/results/json/${output}_lab_dr_report.json
+		#piabove=$(cat ${output}_PI_above.csv | sed 's/,/\n/g' | sort -u | sed -z 's/\n/,/g; s/,$/\n/')
+		#nrtiabove=$(cat ${output}_NRTI_above.csv | sed 's/,/\n/g' | sort -u | sed -z 's/\n/,/g; s/,$/\n/')
+		#nnrtiabove=$(cat ${output}_NNRTI_above.csv | sed 's/,/\n/g' | sort -u | sed -z 's/\n/,/g; s/,$/\n/')
+		#instiabove=$(cat ${output}_INSTI_above.csv | sed 's/,/\n/g' | sort -u | sed -z 's/\n/,/g; s/,$/\n/')
+	        pimajor=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/pi_drms.csv | sed -z 's/\n/,/g; s/,$/\n/') #grep -f - ${output}_mutation_frequency.csv  | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+       		piaccessory=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/pi_drms.csv | sed -z 's/\n/,/g; s/,$/\n/') #grep -f - ${output}_mutation_frequency.csv  | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+        	piother=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Other | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | sed -z 's/\n/,/g; s/,$/\n/') #grep -f - ${output}_mutation_frequency.csv  | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+        	nrtimut=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 NRTI | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/nrti_drms.csv | sed -z 's/\n/,/g; s/,$/\n/') #grep -f - ${output}_mutation_frequency.csv  | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+        	nnrtimut=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 NNRTI | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/nnrti_drms.csv | sed -z 's/\n/,/g; s/,$/\n/') #grep -f - ${output}_mutation_frequency.csv  | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+        	rtother=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 Other | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | sed -z 's/\n/,/g; s/,$/\n/') #grep -f - ${output}_mutation_frequency.csv  | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+        	inmajor=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/insti_drms.csv | sed -z 's/\n/,/g; s/,$/\n/') #grep -f - ${output}_mutation_frequency.csv  | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+        	inaccessory=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' |grep -wf - ${mutations}/insti_drms.csv |  sed -z 's/\n/,/g; s/,$/\n/') #grep -f - ${output}_mutation_frequency.csv  | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+        	inother=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Other | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | sed -z 's/\n/,/g; s/,$/\n/') #grep -f - ${output}_mutation_frequency.csv  | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+
+		## add the above mutations to the json
+		echo -e " \"Major.Mutations\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+		echo -e "   \"pi.major.mutations\":\"$pimajor\"," >> ${output}/results/json/${output}_lab_dr_report.json
+		echo -e "   \"pi.accessory.mutations\":\"$piaccessory\"," >> ${output}/results/json/${output}_lab_dr_report.json
+		echo -e "   \"nrti.mutations\":\"$nrtimut\"," >> ${output}/results/json/${output}_lab_dr_report.json
+		echo -e "   \"nnrti.mutations\":\"$nnrtimut\"," >> ${output}/results/json/${output}_lab_dr_report.json
+		echo -e "   \"insti.major.mutations\":\"$inmajor\"," >> ${output}/results/json/${output}_lab_dr_report.json
+		echo -e "   \"insti.accessory.mutations\":\"$inaccesory\"" >> ${output}/results/json/${output}_lab_dr_report.json
+		echo -e " }," >> ${output}/results/json/${output}_lab_dr_report.json
+
+		## create below mutations
+		#pibelow=$(cat ${output}_mutation_frequency.csv | grep -E "=PIMajor|=PIAccessory" | awk '$3 < 20 && $2 ~ /PASS/' | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+		#nrtibelow=$(cat ${output}_mutation_frequency.csv | grep -E "=NRTI" | awk '$3 < 20 && $2 ~ /PASS/' | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+		#nnrtibelow=$(cat ${output}_mutation_frequency.csv | grep -E "=NNRTI" | awk '$3 < 20 && $2 ~ /PASS/' | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+		#instibelow=$(cat ${output}_mutation_frequency.csv | grep -E "=Major|=Accessory" | awk '$3 < 20 && $2 ~ /PASS/' | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+	
+		## add the below mutations to the json
+		echo -e " \"Minor.Mutations\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+		echo -e "   \"piother.mutations\":\"$piother\"," >> ${output}/results/json/${output}_lab_dr_report.json
+		echo -e "   \"rtother.mutations\":\"$rtother\"," >> ${output}/results/json/${output}_lab_dr_report.json
+		echo -e "   \"instiother.mutations\":\"$inother\"" >> ${output}/results/json/${output}_lab_dr_report.json
+		echo -e " }," >> ${output}/results/json/${output}_lab_dr_report.json
+
+		# create comments
+		echo "=========================comments for $output===================================="
+		grep -C 3 comments ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -E "text|type" | cut -f2 -d":" | sed 's/,$//' | awk 'ORS=NR%3?"\t":"\n"' > ${output}_comments.csv # create comments for the sample from sierralocal json output
+
+		## create comments for rt
+		touch ${output}_nnrti.csv
+		echo "===create nnrti for $output============="
+		cat ${output}_comments.csv | awk '$2=="\"NNRTI\""' | cut -f3 | sort -u | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$//' > ${output}_nnrti.csv
+
+		touch ${output}_nrti.csv
+		echo "===create nrti for $output============="
+		cat ${output}_comments.csv | awk '$2=="\"NRTI\""' | cut -f3 | sort -u | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$//' > ${output}_nrti.csv
+
+		## create comments for pi and insti
+		touch ${output}_pimajor.csv
+		touch ${output}_piaccessory.csv
+		touch ${output}_instimajor.csv
+		touch ${output}_instiaccessory.csv
+
+		## major
+		for m in $(cat ${output}_comments.csv | awk '$2=="\"Major\""' | sort -u | cut -f1 | sed 's/"//g; s/ //')
+		do
+        		dclass=$(grep -w $m ${output}/results/json/${output}_lab_dr_report.json | cut -f1 -d"." | sed 's/"//' | sed 's/   //') # get class
+        		if  [ "$dclass" == "pi" ] # is it a pi
+ 	 		then
+                		echo "========pimajor for $output================="
+                		awk -v var="$m" '$1 ~ var' ${output}_comments.csv | cut -f3 | sort -u | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_pimajor.csv
+        		elif [ "$dclass" == "insti" ] # is it an insti
+        		then
+                		echo "========instimajor for $output============="
+                		awk -v var="$m" '$i ~ var' ${output}_comments.csv | cut -f3 | sort -u | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_instimajor.csv
+        		fi
+		done
+
+
+		## accessory
+		for n in $(cat ${output}_comments.csv | awk '$2=="\"Accessory\""' | sort -u | cut -f1 | sed 's/"//g; s/ //')
+		do
+        		dclass2=$(grep -w $n ${output}/results/json/${output}_lab_dr_report.json | cut -f1 -d"." | sed 's/"//' | sed 's/   //') # get class
+        		if  [ "$dclass2" == "pi" ] # is it a pi
+        		then
+                		echo "==========piaccessory==============="
+                		awk -v var="$n" '$1 ~ var' ${output}_comments.csv | cut -f3 | sort -u | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_piaccessory.csv
+        		elif [ "$dclass2" == "insti" ] # is it an insti
+        		then
+                		echo "=========instiaccessory==========="
+                		awk -v var="$n" '$i ~ var' ${output}_comments.csv | cut -f3 | sort -u | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_instiaccessory.csv
+        		fi
+		done
+
+                #NEW COMMENTS EXTRACTION
+                ##PI
+                touch ${output}_pi_mutsmajor.csv
+                echo "xxx" > ${output}_pi_mutsmajor.csv
+                touch ${output}_pi_mutsaccessory.csv
+                echo "xxx" > ${output}_pi_mutsaccessory.csv
+                sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/pi_drms.csv >> ${output}_pi_mutsmajor.csv
+                sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/pi_drms.csv >> ${output}_pi_mutsaccessory.csv
+
+                rm ${output}_pimajor.csv
+                touch ${output}_pimajor.csv
+                for i in $(cat ${output}_pi_mutsmajor.csv)
+                do
+                       sed -n "/^$i\t/p" ${mutations}/pi_comments.csv
+                done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_pimajor.csv
+
+                rm ${output}_piaccessory.csv
+                touch ${output}_piaccessory.csv
+                for i in $(cat ${output}_pi_mutsaccessory.csv)
+                do
+                         sed -n "/^$i\t/p" ${mutations}/pi_comments.csv
+                done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_piaccessory.csv
+
+                ##INSTI
+                touch ${output}_insti_mutsmajor.csv
+                echo "xxx" > ${output}_insti_mutsmajor.csv
+                touch ${output}_insti_mutsaccessory.csv
+                echo "xxx" > ${output}_insti_mutsaccessory.csv
+                sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/insti_drms.csv >> ${output}_insti_mutsmajor.csv
+                sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/insti_drms.csv >> ${output}_insti_mutsaccessory.csv
+
+                rm ${output}_instimajor.csv
+                touch ${output}_instimajor.csv
+                for i in $(cat ${output}_insti_mutsmajor.csv)
+                do
+                        sed -n "/^$i\t/p" ${mutations}/insti_comments.csv
+                done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_instimajor.csv
+
+                rm ${output}_instiaccessory.csv
+                touch ${output}_instiaccessory.csv
+                for i in $(cat ${output}_insti_mutsaccessory.csv)
+                do
+                        sed -n "/^$i\t/p" ${mutations}/insti_comments.csv
+                done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_instiaccessory.csv
+
+                ##NRTI
+                touch ${output}_nrti_mutsmajor.csv
+                echo "xxx" > ${output}_nrti_mutsmajor.csv
+                sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 NRTI | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/nrti_drms.csv >> ${output}_nrti_mutsmajor.csv
+
+                rm ${output}_nrti.csv
+                touch ${output}_nrti.csv
+                for i in $(cat ${output}_nrti_mutsmajor.csv)
+                do
+                        sed -n "/^$i\t/p" ${mutations}/nrti_comments.csv
+                done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_nrti.csv
+
+                ##NNRTI
+                touch ${output}_nnrti_mutsmajor.csv
+                echo "xxx" > ${output}_nnrti_mutsmajor.csv
+                sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 NNRTI | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/nnrti_drms.csv >> ${output}_nnrti_mutsmajor.csv
+
+                rm ${output}_nnrti.csv
+                touch ${output}_nnrti.csv
+                for i in $(cat ${output}_nnrti_mutsmajor.csv)
+                do
+                        sed -n "/^$i\t/p" ${mutations}/nnrti_comments.csv
+                done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_nnrti.csv
+
+######################################################################################################################################################
+
+		### Add the comments to the json
+		echo -e " \"comments\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+		##### Add RT comments
+		echo "==============add rt comments================="
+		echo -e " \"rt\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+		echo -e "   \"nnrti\":\"$(cat ${output}_nnrti.csv)\"," >> ${output}/results/json/${output}_lab_dr_report.json
+		echo -e "   \"nrti\":\"$(cat ${output}_nrti.csv)\"" >> ${output}/results/json/${output}_lab_dr_report.json
+		echo -e " }," >> ${output}/results/json/${output}_lab_dr_report.json
+
+		###### Add PI comments
+		echo "===========add pi comments==============="
+		echo -e " \"pi\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+		echo -e "   \"major\":\"$(cat ${output}_pimajor.csv)\"," >> ${output}/results/json/${output}_lab_dr_report.json
+		echo -e "   \"accessory\":\"$(cat ${output}_piaccessory.csv)\"" >> ${output}/results/json/${output}_lab_dr_report.json
+		echo -e " }," >> ${output}/results/json/${output}_lab_dr_report.json
+
+		##### Add INSTI comments
+		echo "====================add insti comments============"
+		echo -e " \"insti\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+		echo -e "   \"major\":\"$(cat ${output}_instimajor.csv)\"," >> ${output}/results/json/${output}_lab_dr_report.json
+		echo -e "   \"accessory\":\"$(cat ${output}_instiaccessory.csv)\"" >> ${output}/results/json/${output}_lab_dr_report.json
+		echo -e " }" >> ${output}/results/json/${output}_lab_dr_report.json
+		echo -e "}," >> ${output}/results/json/${output}_lab_dr_report.json
+		echo -e " \"runDetails\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+		echo -e "   \"amplified\": "true"," >> ${output}/results/json/${output}_lab_dr_report.json # add amplification
+		echo -e "   \"testDate\":\"$(date +%F" "%T)\"" >> ${output}/results/json/${output}_lab_dr_report.json
+		echo -e "  }\n}" >> ${output}/results/json/${output}_lab_dr_report.json
+
+
+		echo "==============making final json for $output====================="
+		sed -i 's/DFT/D4T/g' ${output}/results/json/${output}_lab_dr_report.json # convert DFT back to DFT
+		cat ${output}/results/json/${output}_lab_dr_report.json | sed -z 's/,\n ]/\n ]/; s/|"/"/' > ${output}/results/json/${output}.json
+		rm ${output}/results/json/${output}_lab_dr_report.json
+		
+		## Create pdf report
+		echo "DRUG CLASS,DRUG,RESISTANCE PROFILE,DRMS above 20 percent prevalence" > ${output}/results/json/${output}_res.csv # create header for the resistance profile
+		for i in $(grep -A3 "Drug.Class" ${output}/results/json/${output}.json | grep -v Name | cut -f2 -d":" | grep -v "\-\-" |   awk 'ORS=NR%3?"\t":"\n"' | sed 's/"//g; s/,//g; s/\t/,/g' | cut -f1 -d",")
+		do
+			mut=$(grep -A6 Major.Mutations ${output}/results/json/${output}.json | grep -i -w "$i" | cut -f2 -d":" | sed 's/"//g' | sed 's/,$//' | sed -z 's/\n/#/g; s/#$/\n/; s/#/,/g' | sed 's/,$//')
+			echo $mut
+		done | sed 's/,/;/g' > ${output}/results/json/${output}_mutations.csv ## Create a list of mutations
+		grep -A3 "Drug.Class" ${output}/results/json/${output}.json | grep -v Name | cut -f2 -d":" | grep -v "\-\-" |   awk 'ORS=NR%3?"\t":"\n"' | sed 's/Susceptible/S/; s/Potential Low-Level Resistance/PLR/; s/Low-Level Resistance/LR/; s/Intermediate Resistance/IR/; s/High-Level Resistance/HR/' | sed 's/"//g; s/,//g; s/\t/,/g' | paste -d"," - ${output}/results/json/${output}_mutations.csv | sed -E 's/\([0-9]+(\.[0-9]+)?%\)//g'  >> ${output}/results/json/${output}_res.csv ## add resistance profiles together with the mutations
+		
+		## create comments file
+		echo -e "DRUG CLASS\tCOMMENTS" > ${output}/results/json/${output}_comments_drugs.csv ## add header
+		
+		### PI
+		grep -A 11 comments ${output}/results/json/${output}.json | grep -w -A 2 pi | grep -E "major|accessory" | cut -f2- -d":" | sed 's/"//g; s/|$//' | sed 's/|/\n/g; s/,$//' | sort -u > ${output}/results/json/${output}_pi.csv
+		pi=$(cat ${output}/results/json/${output}_pi.csv | wc -l)
+		for i in $(seq 1 $pi)
+		do
+			echo PI >> ${output}/results/json/${output}_PI_com
+		done
+		paste ${output}/results/json/${output}_PI_com ${output}/results/json/${output}_pi.csv >> ${output}/results/json/${output}_comments_drugs.csv
+		
+		### NRTI
+		grep -A 11 comments ${output}/results/json/${output}.json | grep -w "\"nrti\"" | cut -f2- -d":" | sed 's/"//g; s/|$//' | sed 's/|/\n/g; s/,$//' | sort -u > ${output}/results/json/${output}_nrti.csv
+		nrti=$(cat ${output}/results/json/${output}_nrti.csv | wc -l)
+		for i in $(seq 1 $nrti)
+		do
+			echo NRTI >> ${output}/results/json/${output}_NRTI_com
+		done
+		paste ${output}/results/json/${output}_NRTI_com ${output}/results/json/${output}_nrti.csv >> ${output}/results/json/${output}_comments_drugs.csv
+
+		### NNRTI
+                grep -A 11 comments ${output}/results/json/${output}.json | grep -w "\"nnrti\"" | cut -f2- -d":" | sed 's/"//g; s/|$//' | sed 's/|/\n/g; s/,$//' | sort -u > ${output}/results/json/${output}_nnrti.csv
+                nnrti=$(cat ${output}/results/json/${output}_nnrti.csv | wc -l)
+                for i in $(seq 1 $nnrti)
+                do
+                        echo NNRTI >> ${output}/results/json/${output}_NNRTI_com
+                done
+                paste ${output}/results/json/${output}_NNRTI_com ${output}/results/json/${output}_nnrti.csv >> ${output}/results/json/${output}_comments_drugs.csv
+
+                ### INSTI
+                grep -A 11 comments ${output}/results/json/${output}.json | grep -w -A 2 insti | grep -E "major|accessory" | cut -f2- -d":" | sed 's/"//g; s/|$//' | sed 's/|/\n/g; s/,$//' | sort -u > ${output}/results/json/${output}_insti.csv
+                insti=$(cat ${output}/results/json/${output}_insti.csv | wc -l)
+                for i in $(seq 1 $insti)
+                do
+                        echo INSTI >> ${output}/results/json/${output}_INSTI_com
+                done
+                paste ${output}/results/json/${output}_INSTI_com ${output}/results/json/${output}_insti.csv >> ${output}/results/json/${output}_comments_drugs.csv
+
+		## Create appropriate Rmd
+		cp ${HIVDIR}/accessories/bin/hivdr.Rmd ${output}.Rmd
+		sed -i "s;output_id;$output;" ${output}.Rmd
+		sed -i "s;resistance profile;${output}/results/json/${output}_res.csv;" ${output}.Rmd
+		sed -i "s;comments profile;${output}/results/json/${output}_comments_drugs.csv;" ${output}.Rmd
+		
+		cp ${HIVDIR}/accessories/bin/pdf.R render_pdf.R
+		sed -i "s;copy;$output;" render_pdf.R
+		Rscript render_pdf.R
+                mv ${output}/results/hydra_output/consensus.fasta ${output}/results/${output}.fasta
+                mv ${output}/results/hydra_output/hydra.vcf ${output}/results/${output}.vcf
+                mv ${output}/results/hydra_output/mutation_report.aavf ${output}/results/${output}.aavf
+                mv ${output}.pdf ${output}/results/
+                #rm ${output}.Rmd
+                #rm -rf ${output}/results/hydra_output
+		#rm -rf ${output}/results/sierralocal_output
+		cut -f1-3 -d"," ${output}/results/json/${output}_res.csv > ${output}/results/${output}_res.csv
+      		cut -f1,4 -d"," ${output}/results/json/${output}_res.csv | sort -u > ${output}/results/${output}_drms20.csv
+		#rm render_pdf.R
+		#rm -rf ${output}/results/json
+		## remove the created csv files at the end of the run
+
+		#rm *csv
+	fi
+elif [ "$varcall" = true ]
+then
+        if [ "$single_end" = true ]
+        then
+                if [ -z "$se" ]
+                then
+                        echo "Missing required options: --se" >&2
+                        usage
+			exit 1
+
+                elif [ -n "$se" ]
+                then
+                        # Single-ended reads logic
+                        echo "========================Read trimming $output_dir==========================="
+                        conda activate HIV-DRIVES
+                        output=$(echo $output_dir | sed 's;/$;;' | awk -F"/" '{print $NF}')
+                        ID=$(echo $output | awk -F"/" '{print $NF}') # get identifier
+                        mkdir -p ${output}/tmp
+                        se1=$(echo $se | awk -F"/" '{print $NF}') # get the read name
+                        cp $se ${output}/tmp/ # copy se to tmp dir
+                        trim_galore -q 28 --cores $cores --dont_gzip ${output}/tmp/$se1 --output_dir ${output}/tmp # qc with trim_galore
+                        echo "===========================Variant calling and consensus generation==================================="
+                        se2="*trimmed.fq"
+                        mkdir -p ${output}/{patient_reads,patient_free_reads} # create directories to store patient and patient free reads
+                        conda activate ${pref_conda}/envs/HIV-DRIVES/quasi
+                        bowtie2 -p $cores -x ${HIVDIR}/accessories/data/reference/GRCh38_noalt_as/GRCh38_noalt_as -U ${output}/tmp/$se2 -S ${output}/${ID}_mapped_and_unmapped.sam
+                        samtools view -bS ${output}/${ID}_mapped_and_unmapped.sam | samtools fastq -f 4 -F 256 -@ $cores - -n > ${output}/patient_free_reads/${ID}_host_removed.fastq
+                        samtools view -bS ${output}/${ID}_mapped_and_unmapped.sam | samtools fastq -F 4 -F 256 -@ $cores - -n > ${output}/patient_reads/${ID}_host.fastq
+                        rm ${output}/${ID}_mapped_and_unmapped.sam
+			rm -rf ${output}/tmp
+			se2="${ID}_host_removed.fastq"
+                        mkdir -p ${output}/results/hydra_output
+                        quasitools hydra --min_dp 50 --min_ac 5 --min_variant_qual 30  ${output}/patient_free_reads/$se2 -o ${output}/results/hydra_output -gc
+		      	gzip ${output}/patient_free_reads/*
+      			gzip ${output}/patient_reads/*
+                        sed -i "s/>.*/>$output/" ${output}/results/hydra_output/consensus.fasta
+                        mv ${output}/results/hydra_output/consensus.fasta ${output}/results/${output}.fasta
+                        mv ${output}/results/hydra_output/hydra.vcf ${output}/results/${output}.vcf
+                        mv ${output}/results/hydra_output/mutation_report.aavf ${output}/results/${output}.aavf
+                        rm -rf ${output}/results/hydra_output
+                	if [ ! -s "${output}/results/hydra_output/consensus.fasta" ]
+                	then
+                        	echo "No consensus generated"
+                        	echo "${output},No consensus generated" > ${output}/results/consenus_status.csv
+                        	exit 1
+                	fi
+			conda activate base
+		fi
+	else
+        	if [ -z "$forward_read" ] || [ -z "$reverse_read" ]
+        	then
+               		echo "Missing required options: --forward-read|-f or --reverse-read|-r" >&2
+			usage
+               		exit 1
+        	fi
+
+        	echo "========================Read trimming $output_dir==========================="
+        	conda activate HIV-DRIVES
+        	output=$(echo $output_dir | sed 's;/$;;' | awk -F"/" '{print $NF}')
+        	ID=$(echo $output | awk -F"/" '{print $NF}') # get identifier
+        	mkdir -p ${output}/tmp
+        	R1=$(echo $forward_read | awk -F"/" '{print $NF}') # get the forward file name
+        	R2=$(echo $reverse_read | awk -F"/" '{print $NF}') # get the reverse file name
+        	cp $forward_read ${output}/tmp/ # copy R1 to tmp dir
+        	cp $reverse_read ${output}/tmp/ # copy R2 to tmp dir
+        	trim_galore -q 28 --cores $cores --dont_gzip --paired ${output}/tmp/$R1 ${output}/tmp/$R2 --output_dir ${output}/tmp # qc with trim_galore
+        	echo "===========================Variant calling and consensus generation==================================="
+        	R3="*_val_1.fq"
+        	R4="*_val_2.fq"
+        	mkdir -p ${output}/{patient_reads,patient_free_reads} # create directories to store patient and patient free reads
+        	conda activate ${pref_conda}/envs/HIV-DRIVES/quasi
+        	bowtie2 -p $cores -x ${HIVDIR}/accessories/data/reference/GRCh38_noalt_as/GRCh38_noalt_as -1 ${output}/tmp/$R3 -2 ${output}/tmp/$R4 -S ${output}/${ID}_mapped_and_unmapped.sam
+		samtools view -bS ${output}/${ID}_mapped_and_unmapped.sam | samtools fastq -f 12 -F 256 -@ $cores - -1 ${output}/patient_free_reads/${ID}_host_removed_R1.fastq -2  ${output}/patient_free_reads/${ID}_host_removed_R2.fastq -0 /dev/null -s /dev/null -n
+        	samtools view -bS ${output}/${ID}_mapped_and_unmapped.sam | samtools fastq -F 12 -F 256 -@ $cores - -1 ${output}/patient_reads/${ID}_host_R1.fastq -2  ${output}/patient_reads/${ID}_host_R2.fastq -0 /dev/null -s /dev/null -n
+        	R3="${ID}_host_removed_R1.fastq"
+        	R4="${ID}_host_removed_R2.fastq"
+        	mkdir -p ${output}/results/hydra_output
+        	quasitools hydra --min_dp 50 --min_ac 5 --min_variant_qual 30  ${output}/patient_free_reads/$R3 ${output}/patient_free_reads/$R4 -o ${output}/results/hydra_output -gc
+      		gzip ${output}/patient_free_reads/*
+      		gzip ${output}/patient_reads/*
+		sed -i "s/>.*/>$output/" ${output}/results/hydra_output/consensus.fasta
+                mv ${output}/results/hydra_output/consensus.fasta ${output}/results/${output}.fasta
+                mv ${output}/results/hydra_output/hydra.vcf ${output}/results/${output}.vcf
+                mv ${output}/results/hydra_output/mutation_report.aavf ${output}/results/${output}.aavf
+                mv ${output}.pdf ${output}/results/
+                rm -rf ${output}/results/hydra_output
+                if [ ! -s "${output}/results/hydra_output/consensus.fasta" ]
+                then
+                        echo "No consensus generated"
+                        echo "${output},No consensus generated" > ${output}/results/consenus_status.csv
+                        exit 1
+                fi
+		conda activate base
+	fi
+
+elif [ "$resistance" = true ]
+then
+	if [ -n "$consensus" ]
+	then
+		echo "$consensus"
+		if [ ! -s "$consensus" ]
+		then
+			echo "The fasta file is empty. Please provide a fasta file with DNA sequence"
+			exit 1
+		fi
+		# check if it is a multifasta file
+		cnt=$(grep -c ">" $consensus)
+		if [ $cnt -eq 1 ]
+		then
+			conda activate HIV-DRIVES
+			output=$(echo $output_dir | sed 's;/$;;' | awk -F"/" '{print $NF}')
+        		mkdir -p ${output}/results/sierralocal_output
+        		if [[ -z "$xml" && -z "$alignment" && -z "$json" ]]
+        		then
+                		sierralocal $consensus -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+        		elif [[ -n "$xml" && -z "$alignment" && -z "$json" ]]
+        		then
+                		sierralocal $consensus -xml $xml -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+        		elif [[ -z "$xml" && -n "$alignment" && -z "$json" ]]
+        		then
+                		sierralocal $consensus -alignment $alignment -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+        		elif [[ -z "$xml" && -z "$alignment" && -n "$json" ]]
+        		then
+                		sierralocal $consensus -json $json -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+        		elif [[ -n "$xml" && -n "$alignment" && -z "$json" ]]
+        		then
+                		sierralocal $consensus -xml $xml -alignment $alignment -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+        		elif [[ -n "$xml" && -z "$alignment" && -n "$json" ]]
+        		then
+                		sierralocal $consensus -xml $xml -json $json -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+        		elif [[ -z "$xml" && -n "$alignment" && -n "$json" ]]
+        		then
+                		sierralocal $consensus -alignment $alignment -json $json -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+        		elif [[ -n "$xml" && -n "$alignment" && -n "$json" ]]
+        		then
+                		sierralocal $consensus -xml $xml -alignment $alignment -json $json -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+        		fi
+			Rscript drug_score_level.R $PWD $output
+			mkdir -p ${output}/results/json
+        		sed -i 's/D4T/DFT/g' ${output}_drug_score_resistance.csv
+        		sed -i 's/D4T/DFT/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+			echo -e "{" > ${output}/results/json/${output}_lab_dr_report.json
+
+        		conda activate HIV-DRIVES
+        		#subtype=$(python3 ${pref_conda}/envs/HIV-DRIVES/lib/python3.9/site-packages/sierralocal/subtyper.py -alignment $alignment  $consensus | tail -1 | cut -f2)
+			subtype=""
+
+        		genesanalysed=$(grep -A 1 gene ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep name | cut -f2 -d":" | sed 's/,//' | sort -u | tr "\n" ","  | sed 's/,$/\n/' | sed 's/"//g')
+
+        		echo -e "\"Subtype\":\"$subtype\",\n\"Genes.Analysed\":\"$genesanalysed\"," >> ${output}/results/json/${output}_lab_dr_report.json # add subtype and genes analysed
+
+        		echo -e "\"data\":[" >> ${output}/results/json/${output}_lab_dr_report.json
+        		for i in $(cut -f3 -d"," ${output}_drug_score_resistance.csv | grep -v Drug | sed 's/"//g') # access the drug names
+        		do
+                		dclass=$(grep -w $i ${output}_drug_score_resistance.csv | cut -f2 -d"," | sed 's/"//g') # create drug class
+                		dname=$(grep -w $i ${HOME}/HIV-DRIVES/databases/drug_names.csv | cut -f2 -d",") # create drug name
+                		dcode=$i
+                		dresistancelevel=$(grep -w $i ${output}_drug_score_resistance.csv | cut -f5 -d",") # create resistance level
+                		dscore=$(grep -w $i ${output}_drug_score_resistance.csv | cut -f4 -d",") # create the score
+#                       	grep -C 5 score ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -E "\"text\": \"[A-Z][0-9]{1,5}[A-Z]{1,2}\"|\"score\"|\"name\"" | sed -n "/$i/,/[A-Z]\{3\}/p" | grep -v name | sed '1d; s/,//; s/"//g' | cut -f2 -d":" | awk 'ORS=NR%2?"\t":"\n"' | sort -u | cut -f1 | sed 's/ //g' > ${output}_mut_freq.csv
+#                       	above=$(grep -f ${output}_mut_freq.csv ${output}_mutation_frequency.csv | awk -v var="$dclass" '$5 == var' | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+#                		grep -f ${output}_mut_freq.csv ${output}_mutation_frequency.csv | awk -v var="$dclass" '$5 == var' | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/' >> ${output}_${dclass}_above.csv
+                		echo -e "   {" >> ${output}/results/json/${output}_lab_dr_report.json
+                		echo -e "     \"Drug.Class\":\"$dclass\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                		echo -e "     \"Drug.Name\":\"$dname\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                		echo -e "     \"Code\":\"$dcode\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                		echo -e "     \"Resistance.level\":$dresistancelevel," >> ${output}/results/json/${output}_lab_dr_report.json
+                		echo -e "     \"score\":$dscore" >> ${output}/results/json/${output}_lab_dr_report.json
+        
+        		done
+        		echo -e " ]," >> ${output}/results/json/${output}_lab_dr_report.json
+        		pimajor=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/pi_drms.csv | sed -z 's/\n/,/g; s/,$/\n/')
+			piaccessory=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/pi_drms.csv | sed -z 's/\n/,/g; s/,$/\n/')
+			piother=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Other | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | sed -z 's/\n/,/g; s/,$/\n/')
+        		nrtimut=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 NRTI | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/nrti_drms.csv | sed -z 's/\n/,/g; s/,$/\n/')
+			nnrtimut=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 NNRTI | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' |grep -wf - ${mutations}/nnrti_drms.csv |  sed -z 's/\n/,/g; s/,$/\n/')
+			rtother=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 Other | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | sed -z 's/\n/,/g; s/,$/\n/')
+  			inmajor=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/insti_drms.csv | sed -z 's/\n/,/g; s/,$/\n/')
+   			inaccessory=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/insti_drms.csv | sed -z 's/\n/,/g; s/,$/\n/')
+   			inother=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Other | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | sed -z 's/\n/,/g; s/,$/\n/')
+
+        		## add the above mutations to the json
+        		echo -e " \"Major.Mutations\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+        		echo -e "   \"pi.major.mutations\":\"$pimajor\"," >> ${output}/results/json/${output}_lab_dr_report.json
+			echo -e "   \"pi.accessory.mutations\":\"$piaccessory\"," >> ${output}/results/json/${output}_lab_dr_report.json
+        		echo -e "   \"nrti.mutations\":\"$nrtimut\"," >> ${output}/results/json/${output}_lab_dr_report.json
+        		echo -e "   \"nnrti.mutations\":\"$nnrtimut\"," >> ${output}/results/json/${output}_lab_dr_report.json
+        		echo -e "   \"insti.major.mutations\":\"$inmajor\"," >> ${output}/results/json/${output}_lab_dr_report.json
+        		echo -e "   \"insti.accessory.mutations\":\"$inaccessory\"" >> ${output}/results/json/${output}_lab_dr_report.json
+			echo -e " }," >> ${output}/results/json/${output}_lab_dr_report.json
+
+        		## add the below mutations to the json
+        		echo -e " \"Minor.Mutations\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+        		echo -e "   \"piother.mutations\":\"$piother\"," >> ${output}/results/json/${output}_lab_dr_report.json
+        		echo -e "   \"rtother.mutations\":\"$rtother\"," >> ${output}/results/json/${output}_lab_dr_report.json
+        		echo -e "   \"instiother.mutations\":\"$inother\"" >> ${output}/results/json/${output}_lab_dr_report.json
+        		echo -e " }," >> ${output}/results/json/${output}_lab_dr_report.json
+                
+			### Add the comments to the json
+                	echo -e " \"comments\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+                
+			#### Create the comments files
+			touch ${output}_nnrti_comments.csv
+			touch ${output}_nrti_comments.csv
+			touch ${output}_pimajor_comments.csv
+			touch ${output}_piaccessory_comments.csv
+			touch ${output}_instimajor_comments.csv
+			touch ${output}_instiaccessory_comments.csv
+
+			#### Create the mutation files
+                	touch ${output}_nnrti_muts.csv
+                	touch ${output}_nrti_muts.csv
+                	touch ${output}_pimajor_muts.csv
+                	touch ${output}_piaccessory_muts.csv
+                	touch ${output}_instimajor_muts.csv
+                	touch ${output}_instiaccessory_muts.csv
+		
+			#### extract mutations
+			sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | awk '{match($0, /[0-9]+/); digit = substr($0, RSTART, RLENGTH); print substr($0, 1, 1) digit substr($0, length($0))}' > ${output}_pimajor_muts.csv
+			sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | awk '{match($0, /[0-9]+/); digit = substr($0, RSTART, RLENGTH); print substr($0, 1, 1) digit substr($0, length($0))}' > ${output}_piaccessory_muts.csv
+			sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | awk '{match($0, /[0-9]+/); digit = substr($0, RSTART, RLENGTH); print substr($0, 1, 1) digit substr($0, length($0))}' > ${output}_instimajor_muts.csv
+			sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | awk '{match($0, /[0-9]+/); digit = substr($0, RSTART, RLENGTH); print substr($0, 1, 1) digit substr($0, length($0))}' > ${output}_instiaccessory_muts.csv
+			
+			#### Extract the comments
+			grep -A3 comments ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -A1 -w NNRTI | grep text | sort -u | cut -f2 -d":" | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/\n/' > ${output}_nnrti_comments.csv
+			grep -A3 comments ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -A1 -w NRTI | grep text | sort -u | cut -f2 -d":" | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/\n/' > ${output}_nrti_comments.csv	
+			grep -A3 -B2 comments ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep text | grep -A1 -f ${output}_pimajor_muts.csv | grep "                        \"text\"" | cut -f2 -d":" | sort -u | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/\n/' > ${output}_pimajor_comments.csv
+			grep -A3 -B2 comments ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep text | grep -A1 -f ${output}_piaccessory_muts.csv | grep "                        \"text\"" | cut -f2 -d":" | sort -u | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/\n/' > ${output}_piaccessory_comments.csv
+			grep -A3 -B2 comments ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep text | grep -A1 -f ${output}_instimajor_muts.csv | grep "                        \"text\"" | cut -f2 -d":" | sort -u | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/\n/' > ${output}_instimajor_comments.csv
+			grep -A3 -B2 comments ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep text | grep -A1 -f ${output}_instiaccessory_muts.csv | grep "                        \"text\"" | cut -f2 -d":" | sort -u | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/\n/' > ${output}_instiaccessory_comments.csv
+
+                        #NEW COMMENTS EXTRACTION
+                        ##PI
+                        touch ${output}_pi_mutsmajor.csv
+                        echo "xxx" > ${output}_pi_mutsmajor.csv
+                        touch ${output}_pi_mutsaccessory.csv
+                        echo "xxx" > ${output}_pi_mutsaccessory.csv
+                        sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/pi_drms.csv >> ${output}_pi_mutsmajor.csv
+                        sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/pi_drms.csv >> ${output}_pi_mutsaccessory.csv
+
+                        rm ${output}_pimajor_comments.csv
+                        touch ${output}_pimajor_comments.csv
+                        for i in $(cat ${output}_pi_mutsmajor.csv)
+                        do
+                                sed -n "/^$i\t/p" ${mutations}/pi_comments.csv
+                        done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_pimajor_comments.csv
+
+                        rm ${output}_piaccessory_comments.csv
+                        touch ${output}_piaccessory_comments.csv
+                        for i in $(cat ${output}_pi_mutsaccessory.csv)
+                        do
+                                sed -n "/^$i\t/p" ${mutations}/pi_comments.csv
+                        done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_piaccessory_comments.csv
+
+                        ##INSTI
+                        touch ${output}_insti_mutsmajor.csv
+                        echo "xxx" > ${output}_insti_mutsmajor.csv
+                        touch ${output}_insti_mutsaccessory.csv
+                        echo "xxx" > ${output}_insti_mutsaccessory.csv
+                        sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/insti_drms.csv >> ${output}_insti_mutsmajor.csv
+                        sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/insti_drms.csv >> ${output}_insti_mutsaccessory.csv
+
+                        rm ${output}_instimajor_comments.csv
+                        touch ${output}_instimajor_comments.csv
+                        for i in $(cat ${output}_insti_mutsmajor.csv)
+                        do
+                                sed -n "/^$i\t/p" ${mutations}/insti_comments.csv
+                        done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_instimajor_comments.csv
+
+                        rm ${output}_instiaccessory_comments.csv
+                        touch ${output}_instiaccessory_comments.csv
+                        for i in $(cat ${output}_insti_mutsaccessory.csv)
+                        do
+                                sed -n "/^$i\t/p" ${mutations}/insti_comments.csv
+                        done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_instiaccessory_comments.csv
+     
+                        ##NRTI
+                        touch ${output}_nrti_mutsmajor.csv
+                        echo "xxx" > ${output}_nrti_mutsmajor.csv
+                        sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 NRTI | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/nrti_drms.csv >> ${output}_nrti_mutsmajor.csv
+
+                        rm ${output}_nrti_comments.csv
+                        touch ${output}_nrti_comments.csv
+                        for i in $(cat ${output}_nrti_mutsmajor.csv)
+                        do
+                                sed -n "/^$i\t/p" ${mutations}/nrti_comments.csv
+                        done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_nrti_comments.csv
+
+                        ##NNRTI
+                        touch ${output}_nnrti_mutsmajor.csv
+                        echo "xxx" > ${output}_nnrti_mutsmajor.csv
+                        sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 NNRTI | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/nnrti_drms.csv >> ${output}_nnrti_mutsmajor.csv
+     
+                        rm ${output}_nnrti_comments.csv
+                        touch ${output}_nnrti_comments.csv
+                        for i in $(cat ${output}_nnrti_mutsmajor.csv)
+                        do
+                                sed -n "/^$i\t/p" ${mutations}/nnrti_comments.csv
+                        done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_nnrti_comments.csv
+########################################################################################################################################
+			##### Add RT comments
+                	echo "==============add rt comments================="
+                	echo -e " \"rt\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e "   \"nnrti\":\"$(cat ${output}_nnrti_comments.csv)\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e "   \"nrti\":\"$(cat ${output}_nrti_comments.csv)\"" >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e " }," >> ${output}/results/json/${output}_lab_dr_report.json
+
+                	###### Add PI comments
+                	echo "===========add pi comments==============="
+                	echo -e " \"pi\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e "   \"major\":\"$(cat ${output}_pimajor_comments.csv)\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e "   \"accessory\":\"$(cat ${output}_piaccessory_comments.csv)\"" >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e " }," >> ${output}/results/json/${output}_lab_dr_report.json
+
+                	##### Add INSTI comments
+                	echo "====================add insti comments============"
+                	echo -e " \"insti\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e "   \"major\":\"$(cat ${output}_instimajor_comments.csv)\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e "   \"accessory\":\"$(cat ${output}_instiaccessory_comments.csv)\"" >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e " }" >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e "}," >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e " \"runDetails\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e "   \"amplified\": "true"," >> ${output}/results/json/${output}_lab_dr_report.json # add amplification
+                	echo -e "   \"testDate\":\"$(date +%F" "%T)\"" >> ${output}/results/json/${output}_lab_dr_report.json
+                	echo -e "  }\n}" >> ${output}/results/json/${output}_lab_dr_report.json
+
+
+                	echo "==============making final json for $output====================="
+                	sed -i 's/DFT/D4T/g' ${output}/results/json/${output}_lab_dr_report.json # convert DFT back to DFT
+                	cat ${output}/results/json/${output}_lab_dr_report.json | sed -z 's/,\n ]/\n ]/; s/|"/"/' > ${output}/results/json/${output}.json
+                	rm ${output}/results/json/${output}_lab_dr_report.json
+		
+                	## Create pdf report
+                	echo "DRUG CLASS,DRUG,RESISTANCE PROFILE,DRMS above 20 percent prevalence" > ${output}/results/json/${output}_res.csv # create header for the resistance profile
+                	for i in $(grep -A3 "Drug.Class" ${output}/results/json/${output}.json | grep -v Name | cut -f2 -d":" | grep -v "\-\-" |   awk 'ORS=NR%3?"\t":"\n"' | sed 's/"//g; s/,//g; s/\t/,/g' | cut -f1 -d",")
+                	do
+                        	mut=$(grep -A6 Major.Mutations ${output}/results/json/${output}.json | grep -i -w "$i" | cut -f2 -d":" | sed 's/"//g' | sed 's/,$//' | sed -z 's/\n/#/g; s/#$/\n/; s/#/,/g' | sed 's/,$//')
+                        	echo $mut
+                	done | sed 's/,/;/g' > ${output}/results/json/${output}_mutations.csv ## Create a list of mutations
+                	grep -A3 "Drug.Class" ${output}/results/json/${output}.json | grep -v Name | cut -f2 -d":" | grep -v "\-\-" |   awk 'ORS=NR%3?"\t":"\n"' | sed 's/Susceptible/S/; s/Potential Low-Level Resistance/PLR/; s/Low-Level Resistance/LR/; s/Intermediate Resistance/IR/; s/High-Level Resistance/HR/' | sed 's/"//g; s/,//g; s/\t/,/g' | paste -d"," - ${output}/results/json/${output}_mutations.csv | sed -E 's/\([0-9]+(\.[0-9]+)?%\)//g'  >> ${output}/results/json/${output}_res.csv ## add resistance profiles together with the mutations
+
+                	## create comments file
+                	echo -e "DRUG CLASS\tCOMMENTS" > ${output}/results/json/${output}_comments_drugs.csv ## add header
+
+                	### PI
+                	grep -A 11 comments ${output}/results/json/${output}.json | grep -w -A 2 pi | grep -E "major|accessory" | cut -f2- -d":" | sed 's/"//g; s/|$//' | sed 's/|/\n/g; s/,$//' | sort -u > ${output}/results/json/${output}_pi.csv
+                	pi=$(cat ${output}/results/json/${output}_pi.csv | wc -l)
+                	for i in $(seq 1 $pi)
+                	do
+                        	echo PI >> ${output}/results/json/${output}_PI_com
+                	done
+                	paste ${output}/results/json/${output}_PI_com ${output}/results/json/${output}_pi.csv >> ${output}/results/json/${output}_comments_drugs.csv
+
+                	### NRTI
+                	grep -A 11 comments ${output}/results/json/${output}.json | grep -w "\"nrti\"" | cut -f2- -d":" | sed 's/"//g; s/|$//' | sed 's/|/\n/g; s/,$//' | sort -u > ${output}/results/json/${output}_nrti.csv
+                	nrti=$(cat ${output}/results/json/${output}_nrti.csv | wc -l)
+                	for i in $(seq 1 $nrti)
+                	do
+                        	echo NRTI >> ${output}/results/json/${output}_NRTI_com
+                	done
+                	paste ${output}/results/json/${output}_NRTI_com ${output}/results/json/${output}_nrti.csv >> ${output}/results/json/${output}_comments_drugs.csv
+
+                	### NNRTI
+                	grep -A 11 comments ${output}/results/json/${output}.json | grep -w "\"nnrti\"" | cut -f2- -d":" | sed 's/"//g; s/|$//' | sed 's/|/\n/g; s/,$//' | sort -u > ${output}/results/json/${output}_nnrti.csv
+                	nnrti=$(cat ${output}/results/json/${output}_nnrti.csv | wc -l)
+                	for i in $(seq 1 $nnrti)
+                	do
+                        	echo NNRTI >> ${output}/results/json/${output}_NNRTI_com
+                	done
+                	paste ${output}/results/json/${output}_NNRTI_com ${output}/results/json/${output}_nnrti.csv >> ${output}/results/json/${output}_comments_drugs.csv
+
+                	### INSTI
+                	grep -A 11 comments ${output}/results/json/${output}.json | grep -w -A 2 insti | grep -E "major|accessory" | cut -f2- -d":" | sed 's/"//g; s/|$//' | sed 's/|/\n/g; s/,$//' | sort -u > ${output}/results/json/${output}_insti.csv
+                	insti=$(cat ${output}/results/json/${output}_insti.csv | wc -l)
+                	for i in $(seq 1 $insti)
+                	do
+                        	echo INSTI >> ${output}/results/json/${output}_INSTI_com
+                	done
+                	paste ${output}/results/json/${output}_INSTI_com ${output}/results/json/${output}_insti.csv >> ${output}/results/json/${output}_comments_drugs.csv
+
+                	## Create appropriate Rmd
+                	cp ${HIVDIR}/accessories/bin/hivdr.Rmd ${output}.Rmd
+                	sed -i "s;output_id;$output;" ${output}.Rmd
+                	sed -i "s;resistance profile;${output}/results/json/${output}_res.csv;" ${output}.Rmd
+                	sed -i "s;comments profile;${output}/results/json/${output}_comments_drugs.csv;" ${output}.Rmd
+
+                	cp ${HIVDIR}/accessories/bin/pdf.R render_pdf.R
+                	sed -i "s;copy;$output;" render_pdf.R
+                	Rscript render_pdf.R
+                        mv ${output}.pdf ${output}/results/
+                        rm ${output}.Rmd
+                        rm -rf ${output}/results/sierralocal_output
+                        cut -f1-3 -d"," ${output}/results/json/${output}_res.csv > ${output}/results/${output}_res.csv
+                        cut -f1,4 -d"," ${output}/results/json/${output}_res.csv | sort -u > ${output}/results/${output}_drms20.csv
+                        rm render_pdf.R
+                        rm -rf ${output}/results/json
+                	## remove the created csv files at the end of the run
+
+                	rm *csv
+
+		elif [ $cnt -gt 1 ]
+		then
+			multi_out=$(echo $output_dir | sed 's;/$;;' | awk -F"/" '{print $NF}')
+			mkdir $multi_out
+			cp $consensus copy.fasta
+			sed -i '/>/s/ /_/g' copy.fasta
+			for i in $(grep ">" copy.fasta | cut -f2 -d">")
+			do
+				echo ">$i" > ${i}.fasta
+				sed -n "/>$i/, />/p" copy.fasta | grep -v ">" | sed -z 's/\n/#/g; s/#$/\n/; s/#//g' >> ${i}.fasta
+				consensus="${i}.fasta"
+				conda activate HIV-DRIVES
+                        	output=$i
+                        	mkdir -p ${output}/results/sierralocal_output
+                        	if [[ -z "$xml" && -z "$alignment" && -z "$json" ]]
+                        	then
+                                	sierralocal $consensus -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                        	elif [[ -n "$xml" && -z "$alignment" && -z "$json" ]]
+                        	then
+                                	sierralocal $consensus -xml $xml -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                        	elif [[ -z "$xml" && -n "$alignment" && -z "$json" ]]
+                        	then
+                                	sierralocal $consensus -alignment $alignment -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                        	elif [[ -z "$xml" && -z "$alignment" && -n "$json" ]]
+                        	then
+                                	sierralocal $consensus -json $json -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                        	elif [[ -n "$xml" && -n "$alignment" && -z "$json" ]]
+                        	then
+                                	sierralocal $consensus -xml $xml -alignment $alignment -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                        	elif [[ -n "$xml" && -z "$alignment" && -n "$json" ]]
+                        	then
+                                	sierralocal $consensus -xml $xml -json $json -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                        	elif [[ -z "$xml" && -n "$alignment" && -n "$json" ]]
+                        	then
+                                	sierralocal $consensus -alignment $alignment -json $json -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                        	elif [[ -n "$xml" && -n "$alignment" && -n "$json" ]]
+                        	then
+                                	sierralocal $consensus -xml $xml -alignment $alignment -json $json -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                        	fi
+                        	Rscript drug_score_level.R $PWD $output
+                        	mkdir -p ${output}/results/json
+                        	sed -i 's/D4T/DFT/g' ${output}_drug_score_resistance.csv
+                        	sed -i 's/D4T/DFT/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                        	echo -e "{" > ${output}/results/json/${output}_lab_dr_report.json
+
+                        	conda activate HIV-DRIVES
+                        	#subtype=$(python3 ${pref_conda}/envs/HIV-DRIVES/lib/python3.9/site-packages/sierralocal/subtyper.py -alignment $alignment  $consensus | tail -1 | cut -f2)
+				subtype=""
+                        	genesanalysed=$(grep -A 1 gene ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep name | cut -f2 -d":" | sed 's/,//' | sort -u | tr "\n" ","  | sed 's/,$/\n/' | sed 's/"//g')
+
+                        	echo -e "\"Subtype\":\"$subtype\",\n\"Genes.Analysed\":\"$genesanalysed\"," >> ${output}/results/json/${output}_lab_dr_report.json # add subtype and genes analysed
+
+                        	echo -e "\"data\":[" >> ${output}/results/json/${output}_lab_dr_report.json
+                        	for i in $(cut -f3 -d"," ${output}_drug_score_resistance.csv | grep -v Drug | sed 's/"//g') # access the drug names
+                        	do
+                                	dclass=$(grep -w $i ${output}_drug_score_resistance.csv | cut -f2 -d"," | sed 's/"//g') # create drug class
+                                	dname=$(grep -w $i ${HIVDIR}/accessories/databases/drug_names.csv | cut -f2 -d",") # create drug name
+                                	dcode=$i
+                                	dresistancelevel=$(grep -w $i ${output}_drug_score_resistance.csv | cut -f5 -d",") # create resistance level
+                                	dscore=$(grep -w $i ${output}_drug_score_resistance.csv | cut -f4 -d",") # create the score
+#                               	grep -C 5 score ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -E "\"text\": \"[A-Z][0-9]{1,5}[A-Z]{1,2}\"|\"score\"|\"name\"" | sed -n "/$i/,/[A-Z]\{3\}/p" | grep -v name | sed '1d; s/,//; s/"//g' | cut -f2 -d":" | awk 'ORS=NR%2?"\t":"\n"' | sort -u | cut -f1 | sed 's/ //g' > ${output}_mut_freq.csv
+#                               	above=$(grep -f ${output}_mut_freq.csv ${output}_mutation_frequency.csv | awk -v var="$dclass" '$5 == var' | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+#                               	grep -f ${output}_mut_freq.csv ${output}_mutation_frequency.csv | awk -v var="$dclass" '$5 == var' | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/' >> ${output}_${dclass}_above.csv
+                                	echo -e "   {" >> ${output}/results/json/${output}_lab_dr_report.json
+                                	echo -e "     \"Drug.Class\":\"$dclass\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                                	echo -e "     \"Drug.Name\":\"$dname\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                                	echo -e "     \"Code\":\"$dcode\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                                	echo -e "     \"Resistance.level\":$dresistancelevel," >> ${output}/results/json/${output}_lab_dr_report.json
+                                	echo -e "     \"score\":$dscore" >> ${output}/results/json/${output}_lab_dr_report.json
+    
+                        	done
+                        	echo -e " ]," >> ${output}/results/json/${output}_lab_dr_report.json
+                        	pimajor=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/pi_drms.csv | sed -z 's/\n/,/g; s/,$/\n/')
+                        	piaccessory=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/pi_drms.csv | sed -z 's/\n/,/g; s/,$/\n/')
+                        	piother=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Other | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | sed -z 's/\n/,/g; s/,$/\n/')
+                        	nrtimut=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 NRTI | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/nrti_drms.csv | sed -z 's/\n/,/g; s/,$/\n/')
+                        	nnrtimut=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 NNRTI | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/nnrti_drms.csv | sed -z 's/\n/,/g; s/,$/\n/')
+                        	rtother=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 Other | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | sed -z 's/\n/,/g; s/,$/\n/')
+                        	inmajor=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/insti_drms.csv | sed -z 's/\n/,/g; s/,$/\n/')
+                        	inaccessory=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/insti_drms.csv | sed -z 's/\n/,/g; s/,$/\n/')
+                        	inother=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Other | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | sed -z 's/\n/,/g; s/,$/\n/')
+
+                        	## add the above mutations to the json
+                        	echo -e " \"Major.Mutations\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e "   \"pi.major.mutations\":\"$pimajor\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e "   \"pi.accessory.mutations\":\"$piaccessory\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e "   \"nrti.mutations\":\"$nrtimut\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e "   \"nnrti.mutations\":\"$nnrtimut\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e "   \"insti.major.mutations\":\"$inmajor\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e "   \"insti.accessory.mutations\":\"$inaccessory\"" >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e " }," >> ${output}/results/json/${output}_lab_dr_report.json
+
+                        	## add the below mutations to the json
+                        	echo -e " \"Minor.Mutations\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e "   \"piother.mutations\":\"$piother\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e "   \"rtother.mutations\":\"$rtother\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e "   \"instiother.mutations\":\"$inother\"" >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e " }," >> ${output}/results/json/${output}_lab_dr_report.json
+    
+                        	### Add the comments to the json
+                        	echo -e " \"comments\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+    
+                        	#### Create the comments files
+                        	touch ${output}_nnrti_comments.csv
+                        	touch ${output}_nrti_comments.csv
+                        	touch ${output}_pimajor_comments.csv
+                        	touch ${output}_piaccessory_comments.csv
+                        	touch ${output}_instimajor_comments.csv
+                        	touch ${output}_instiaccessory_comments.csv
+
+                        	#### Create the mutation files
+                        	touch ${output}_nnrti_muts.csv
+                        	touch ${output}_nrti_muts.csv
+                        	touch ${output}_pimajor_muts.csv
+                        	touch ${output}_piaccessory_muts.csv
+                        	touch ${output}_instimajor_muts.csv
+                        	touch ${output}_instiaccessory_muts.csv
+
+                        	#### extract mutations
+                        	sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | awk '{match($0, /[0-9]+/); digit = substr($0, RSTART, RLENGTH); print substr($0, 1, 1) digit substr($0, length($0))}' > ${output}_pimajor_muts.csv
+                        	sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | awk '{match($0, /[0-9]+/); digit = substr($0, RSTART, RLENGTH); print substr($0, 1, 1) digit substr($0, length($0))}' > ${output}_piaccessory_muts.csv
+                        	sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | awk '{match($0, /[0-9]+/); digit = substr($0, RSTART, RLENGTH); print substr($0, 1, 1) digit substr($0, length($0))}' > ${output}_instimajor_muts.csv
+                        	sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | awk '{match($0, /[0-9]+/); digit = substr($0, RSTART, RLENGTH); print substr($0, 1, 1) digit substr($0, length($0))}' > ${output}_instiaccessory_muts.csv
+
+                        	#### Extract the comments
+                        	grep -A3 comments ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -A1 -w NNRTI | grep text | sort -u | cut -f2 -d":" | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/\n/' > ${output}_nnrti_comments.csv
+                        	grep -A3 comments ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -A1 -w NRTI | grep text | sort -u | cut -f2 -d":" | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/\n/' > ${output}_nrti_comments.csv
+                        	grep -A3 -B2 comments ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep text | grep -A1 -f ${output}_pimajor_muts.csv | grep "                        \"text\"" | cut -f2 -d":" | sort -u | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/\n/' > ${output}_pimajor_comments.csv
+                        	grep -A3 -B2 comments ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep text | grep -A1 -f ${output}_piaccessory_muts.csv | grep "                        \"text\"" | cut -f2 -d":" | sort -u | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/\n/' > ${output}_piaccessory_comments.csv
+                        	grep -A3 -B2 comments ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep text | grep -A1 -f ${output}_instimajor_muts.csv | grep "                        \"text\"" | cut -f2 -d":" | sort -u | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/\n/' > ${output}_instimajor_comments.csv
+                        	grep -A3 -B2 comments ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep text | grep -A1 -f ${output}_instiaccessory_muts.csv | grep "                        \"text\"" | cut -f2 -d":" | sort -u | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/\n/' > ${output}_instiaccessory_comments.csv
+
+                        	#NEW COMMENTS EXTRACTION
+                        	##PI
+                        	touch ${output}_pi_mutsmajor.csv
+                        	echo "xxx" > ${output}_pi_mutsmajor.csv
+                        	touch ${output}_pi_mutsaccessory.csv
+                        	echo "xxx" > ${output}_pi_mutsaccessory.csv
+                        	sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/pi_drms.csv >> ${output}_pi_mutsmajor.csv
+                        	sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/pi_drms.csv >> ${output}_pi_mutsaccessory.csv
+
+                        	rm ${output}_pimajor_comments.csv
+                        	touch ${output}_pimajor_comments.csv
+                        	for i in $(cat ${output}_pi_mutsmajor.csv)
+                        	do
+                                	sed -n "/^$i\t/p" ${mutations}/pi_comments.csv
+                        	done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_pimajor_comments.csv
+
+                        	rm ${output}_piaccessory_comments.csv
+                        	touch ${output}_piaccessory_comments.csv
+                        	for i in $(cat ${output}_pi_mutsaccessory.csv)
+                        	do
+                                	sed -n "/^$i\t/p" ${mutations}/pi_comments.csv
+                        	done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_piaccessory_comments.csv
+
+                        	##INSTI
+                        	touch ${output}_insti_mutsmajor.csv
+                        	echo "xxx" > ${output}_insti_mutsmajor.csv
+                        	touch ${output}_insti_mutsaccessory.csv
+                        	echo "xxx" > ${output}_insti_mutsaccessory.csv
+                       		sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/insti_drms.csv >> ${output}_insti_mutsmajor.csv
+                        	sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/insti_drms.csv >> ${output}_insti_mutsaccessory.csv
+
+                        	rm ${output}_instimajor_comments.csv
+                        	touch ${output}_instimajor_comments.csv
+                        	for i in $(cat ${output}_insti_mutsmajor.csv)
+                        	do
+                                	sed -n "/^$i\t/p" ${mutations}/insti_comments.csv
+                        	done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_instimajor_comments.csv
+
+                        	rm ${output}_instiaccessory_comments.csv
+                        	touch ${output}_instiaccessory_comments.csv
+                        	for i in $(cat ${output}_insti_mutsaccessory.csv)
+                        	do
+                                	sed -n "/^$i\t/p" ${mutations}/insti_comments.csv
+                        	done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_instiaccessory_comments.csv
+
+                        	##NRTI
+                        	touch ${output}_nrti_mutsmajor.csv
+                        	echo "xxx" > ${output}_nrti_mutsmajor.csv
+                        	sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 NRTI | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/nrti_drms.csv >> ${output}_nrti_mutsmajor.csv
+
+                        	rm ${output}_nrti_comments.csv
+                        	touch ${output}_nrti_comments.csv
+                        	for i in $(cat ${output}_nrti_mutsmajor.csv)
+                        	do
+                                	sed -n "/^$i\t/p" ${mutations}/nrti_comments.csv
+                        	done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_nrti_comments.csv
+
+                        	##NNRTI
+                        	touch ${output}_nnrti_mutsmajor.csv
+                        	echo "xxx" > ${output}_nnrti_mutsmajor.csv
+                        	sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 NNRTI | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/nnrti_drms.csv >> ${output}_nnrti_mutsmajor.csv
+
+                        	rm ${output}_nnrti_comments.csv
+                        	touch ${output}_nnrti_comments.csv
+                        	for i in $(cat ${output}_nnrti_mutsmajor.csv)
+                        	do
+                                	sed -n "/^$i\t/p" ${mutations}/nnrti_comments.csv
+                        	done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_nnrti_comments.csv
+########################################################################################################################################
+
+                        	##### Add RT comments
+                        	echo "==============add rt comments================="
+                        	echo -e " \"rt\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e "   \"nnrti\":\"$(cat ${output}_nnrti_comments.csv)\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e "   \"nrti\":\"$(cat ${output}_nrti_comments.csv)\"" >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e " }," >> ${output}/results/json/${output}_lab_dr_report.json
+
+                        	###### Add PI comments
+                        	echo "===========add pi comments==============="
+                        	echo -e " \"pi\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e "   \"major\":\"$(cat ${output}_pimajor_comments.csv)\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e "   \"accessory\":\"$(cat ${output}_piaccessory_comments.csv)\"" >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e " }," >> ${output}/results/json/${output}_lab_dr_report.json
+
+                        	##### Add INSTI comments
+                        	echo "====================add insti comments============"
+                        	echo -e " \"insti\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e "   \"major\":\"$(cat ${output}_instimajor_comments.csv)\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e "   \"accessory\":\"$(cat ${output}_instiaccessory_comments.csv)\"" >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e " }" >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e "}," >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e " \"runDetails\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e "   \"amplified\": "true"," >> ${output}/results/json/${output}_lab_dr_report.json # add amplification
+                        	echo -e "   \"testDate\":\"$(date +%F" "%T)\"" >> ${output}/results/json/${output}_lab_dr_report.json
+                        	echo -e "  }\n}" >> ${output}/results/json/${output}_lab_dr_report.json
+
+
+                        	echo "==============making final json for $output====================="
+                        	sed -i 's/DFT/D4T/g' ${output}/results/json/${output}_lab_dr_report.json # convert DFT back to DFT
+                        	cat ${output}/results/json/${output}_lab_dr_report.json | sed -z 's/,\n ]/\n ]/; s/|"/"/' > ${output}/results/json/${output}.json
+                        	rm ${output}/results/json/${output}_lab_dr_report.json
+
+                		## Create pdf report
+                		echo "DRUG CLASS,DRUG,RESISTANCE PROFILE,DRMS above 20 percent prevalence" > ${output}/results/json/${output}_res.csv # create header for the resistance profile
+                		for i in $(grep -A3 "Drug.Class" ${output}/results/json/${output}.json | grep -v Name | cut -f2 -d":" | grep -v "\-\-" |   awk 'ORS=NR%3?"\t":"\n"' | sed 's/"//g; s/,//g; s/\t/,/g' | cut -f1 -d",")
+                		do
+                        		mut=$(grep -A6 Major.Mutations ${output}/results/json/${output}.json | grep -i -w "$i" | cut -f2 -d":" | sed 's/"//g' | sed 's/,$//' | sed -z 's/\n/#/g; s/#$/\n/; s/#/,/g' | sed 's/,$//')
+                        		echo $mut
+                		done | sed 's/,/;/g' > ${output}/results/json/${output}_mutations.csv ## Create a list of mutations
+                		grep -A3 "Drug.Class" ${output}/results/json/${output}.json | grep -v Name | cut -f2 -d":" | grep -v "\-\-" |   awk 'ORS=NR%3?"\t":"\n"' | sed 's/Susceptible/S/; s/Potential Low-Level Resistance/PLR/; s/Low-Level Resistance/LR/; s/Intermediate Resistance/IR/; s/High-Level Resistance/HR/' | sed 's/"//g; s/,//g; s/\t/,/g' | paste -d"," - ${output}/results/json/${output}_mutations.csv | sed -E 's/\([0-9]+(\.[0-9]+)?%\)//g'  >> ${output}/results/json/${output}_res.csv ## add resistance profiles together with the mutations
+
+                		## create comments file
+                		echo -e "DRUG CLASS\tCOMMENTS" > ${output}/results/json/${output}_comments_drugs.csv ## add header
+
+                		### PI
+                		grep -A 11 comments ${output}/results/json/${output}.json | grep -w -A 2 pi | grep -E "major|accessory" | cut -f2- -d":" | sed 's/"//g; s/|$//' | sed 's/|/\n/g; s/,$//' | sort -u > ${output}/results/json/${output}_pi.csv
+                		pi=$(cat ${output}/results/json/${output}_pi.csv | wc -l)
+                		for i in $(seq 1 $pi)
+                		do
+                        		echo PI >> ${output}/results/json/${output}_PI_com
+                		done
+                		paste ${output}/results/json/${output}_PI_com ${output}/results/json/${output}_pi.csv >> ${output}/results/json/${output}_comments_drugs.csv
+
+                		### NRTI
+                		grep -A 11 comments ${output}/results/json/${output}.json | grep -w "\"nrti\"" | cut -f2- -d":" | sed 's/"//g; s/|$//' | sed 's/|/\n/g; s/,$//' | sort -u > ${output}/results/json/${output}_nrti.csv
+                		nrti=$(cat ${output}/results/json/${output}_nrti.csv | wc -l)
+                		for i in $(seq 1 $nrti)
+                		do
+                        		echo NRTI >> ${output}/results/json/${output}_NRTI_com
+                		done
+                		paste ${output}/results/json/${output}_NRTI_com ${output}/results/json/${output}_nrti.csv >> ${output}/results/json/${output}_comments_drugs.csv
+
+                		### NNRTI
+                		grep -A 11 comments ${output}/results/json/${output}.json | grep -w "\"nnrti\"" | cut -f2- -d":" | sed 's/"//g; s/|$//' | sed 's/|/\n/g; s/,$//' | sort -u > ${output}/results/json/${output}_nnrti.csv
+                		nnrti=$(cat ${output}/results/json/${output}_nnrti.csv | wc -l)
+                		for i in $(seq 1 $nnrti)
+                		do
+                        		echo NNRTI >> ${output}/results/json/${output}_NNRTI_com
+                		done
+                		paste ${output}/results/json/${output}_NNRTI_com ${output}/results/json/${output}_nnrti.csv >> ${output}/results/json/${output}_comments_drugs.csv
+
+                		### INSTI
+                		grep -A 11 comments ${output}/results/json/${output}.json | grep -w -A 2 insti | grep -E "major|accessory" | cut -f2- -d":" | sed 's/"//g; s/|$//' | sed 's/|/\n/g; s/,$//' | sort -u > ${output}/results/json/${output}_insti.csv
+                		insti=$(cat ${output}/results/json/${output}_insti.csv | wc -l)
+                		for i in $(seq 1 $insti)
+                		do
+                        		echo INSTI >> ${output}/results/json/${output}_INSTI_com
+                		done
+                		paste ${output}/results/json/${output}_INSTI_com ${output}/results/json/${output}_insti.csv >> ${output}/results/json/${output}_comments_drugs.csv
+
+                		## Create appropriate Rmd
+                		cp ${HIVDIR}/accessories/bin/hivdr.Rmd ${output}.Rmd
+                		sed -i "s;output_id;$output;" ${output}.Rmd
+                		sed -i "s;resistance profile;${output}/results/json/${output}_res.csv;" ${output}.Rmd
+                		sed -i "s;comments profile;${output}/results/json/${output}_comments_drugs.csv;" ${output}.Rmd
+
+                		cp ${HIVDIR}/accessories/bin/pdf.R render_pdf.R
+                		sed -i "s;copy;$output;" render_pdf.R
+                		Rscript render_pdf.R
+                        	mv ${output}.pdf ${output}/results/
+                        	rm ${output}.Rmd
+                        	rm -rf ${output}/results/sierralocal_output
+                        	cut -f1-3 -d"," ${output}/results/json/${output}_res.csv > ${output}/results/${output}_res.csv
+                        	cut -f1,4 -d"," ${output}/results/json/${output}_res.csv | sort -u > ${output}/results/${output}_drms20.csv
+                        	rm render_pdf.R
+                        	rm -rf ${output}/results/json
+                		## remove the created csv files at the end of the run
+
+                		rm *csv ${output}.fasta
+				mv $output $multi_out
+			done
+		fi
+
+
+	elif [ -n "$sanger" ]
+	then
+		if [ ! -s "$sanger" ]
+		then
+			echo "File is empty"
+			exit 1
+		fi
+		echo ">$sanger" > consensus.fasta
+		cat $sanger >> consensus.fasta
+		consensus="consensus.fasta"
+                conda activate HIV-DRIVES
+                output=$(echo $output_dir | sed 's;/$;;' | awk -F"/" '{print $NF}')
+                mkdir -p ${output}/results/sierralocal_output
+                if [[ -z "$xml" && -z "$alignment" && -z "$json" ]]
+                then
+                        sierralocal $consensus -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                elif [[ -n "$xml" && -z "$alignment" && -z "$json" ]]
+                then
+                        sierralocal $consensus -xml $xml -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                elif [[ -z "$xml" && -n "$alignment" && -z "$json" ]]
+                then
+                        sierralocal $consensus -alignment $alignment -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                elif [[ -z "$xml" && -z "$alignment" && -n "$json" ]]
+                then
+                        sierralocal $consensus -json $json -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                elif [[ -n "$xml" && -n "$alignment" && -z "$json" ]]
+                then
+                        sierralocal $consensus -xml $xml -alignment $alignment -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                elif [[ -n "$xml" && -z "$alignment" && -n "$json" ]]
+                then
+                        sierralocal $consensus -xml $xml -json $json -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                elif [[ -z "$xml" && -n "$alignment" && -n "$json" ]]
+                then
+                        sierralocal $consensus -alignment $alignment -json $json -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                elif [[ -n "$xml" && -n "$alignment" && -n "$json" ]]
+                then
+                        sierralocal $consensus -xml $xml -alignment $alignment -json $json -o ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                fi
+                Rscript drug_score_level.R $PWD $output
+                mkdir -p ${output}/results/json
+                sed -i 's/D4T/DFT/g' ${output}_drug_score_resistance.csv
+                sed -i 's/D4T/DFT/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json
+                echo -e "{" > ${output}/results/json/${output}_lab_dr_report.json
+
+                conda activate HIV-DRIVES
+                #subtype=$(python3 ${pref_conda}/envs/HIV-DRIVES/lib/python3.9/site-packages/sierralocal/subtyper.py -alignment $alignment  $consensus | tail -1 | cut -f2)
+		subtype=""
+                genesanalysed=$(grep -A 1 gene ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep name | cut -f2 -d":" | sed 's/,//' | sort -u | tr "\n" ","  | sed 's/,$/\n/' | sed 's/"//g')
+
+                echo -e "\"Subtype\":\"$subtype\",\n\"Genes.Analysed\":\"$genesanalysed\"," >> ${output}/results/json/${output}_lab_dr_report.json # add subtype and genes analysed
+
+                echo -e "\"data\":[" >> ${output}/results/json/${output}_lab_dr_report.json
+                for i in $(cut -f3 -d"," ${output}_drug_score_resistance.csv | grep -v Drug | sed 's/"//g') # access the drug names
+                do
+                        dclass=$(grep -w $i ${output}_drug_score_resistance.csv | cut -f2 -d"," | sed 's/"//g') # create drug class
+                        dname=$(grep -w $i ${HIVDIR}/accessories/databases/drug_names.csv | cut -f2 -d",") # create drug name
+                        dcode=$i
+                        dresistancelevel=$(grep -w $i ${output}_drug_score_resistance.csv | cut -f5 -d",") # create resistance level
+                        dscore=$(grep -w $i ${output}_drug_score_resistance.csv | cut -f4 -d",") # create the score
+#                       grep -C 5 score ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -E "\"text\": \"[A-Z][0-9]{1,5}[A-Z]{1,2}\"|\"score\"|\"name\"" | sed -n "/$i/,/[A-Z]\{3\}/p" | grep -v name | sed '1d; s/,//; s/"//g' | cut -f2 -d":" | awk 'ORS=NR%2?"\t":"\n"' | sort -u | cut -f1 | sed 's/ //g' > ${output}_mut_freq.csv
+#                       above=$(grep -f ${output}_mut_freq.csv ${output}_mutation_frequency.csv | awk -v var="$dclass" '$5 == var' | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/')
+#                grep -f ${output}_mut_freq.csv ${output}_mutation_frequency.csv | awk -v var="$dclass" '$5 == var' | cut -f1,3 | awk '{print $1"("$2"%)"}' | sed -z 's/\n/,/g; s/,$/\n/' >> ${output}_${dclass}_above.csv
+                        echo -e "   {" >> ${output}/results/json/${output}_lab_dr_report.json
+                        echo -e "     \"Drug.Class\":\"$dclass\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                        echo -e "     \"Drug.Name\":\"$dname\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                        echo -e "     \"Code\":\"$dcode\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                        echo -e "     \"Resistance.level\":$dresistancelevel," >> ${output}/results/json/${output}_lab_dr_report.json
+                        echo -e "     \"score\":$dscore" >> ${output}/results/json/${output}_lab_dr_report.json
+                        echo -e "   }," >> ${output}/results/json/${output}_lab_dr_report.json
+                done
+                echo -e " ]," >> ${output}/results/json/${output}_lab_dr_report.json
+                pimajor=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/pi_drms.csv | sed -z 's/\n/,/g; s/,$/\n/')
+                piaccessory=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/pi_drms.csv | sed -z 's/\n/,/g; s/,$/\n/')
+                piother=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Other | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | sed -z 's/\n/,/g; s/,$/\n/')
+                nrtimut=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 NRTI | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/nrti_drms.csv | sed -z 's/\n/,/g; s/,$/\n/')
+                nnrtimut=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 NNRTI | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/nnrti_drms.csv | sed -z 's/\n/,/g; s/,$/\n/')
+                rtother=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 Other | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | sed -z 's/\n/,/g; s/,$/\n/')
+                inmajor=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/insti_drms.csv | sed -z 's/\n/,/g; s/,$/\n/')
+                inaccessory=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/insti_drms.csv | sed -z 's/\n/,/g; s/,$/\n/')
+                inother=$(sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Other | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | sed -z 's/\n/,/g; s/,$/\n/')
+
+        	## add the above mutations to the json
+                echo -e " \"Major.Mutations\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+                echo -e "   \"pi.major.mutations\":\"$pimajor\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                echo -e "   \"pi.accessory.mutations\":\"$piaccessory\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                echo -e "   \"nrti.mutations\":\"$nrtimut\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                echo -e "   \"nnrti.mutations\":\"$nnrtimut\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                echo -e "   \"insti.major.mutations\":\"$inmajor\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                echo -e "   \"insti.accessory.mutations\":\"$inaccessory\"" >> ${output}/results/json/${output}_lab_dr_report.json
+                echo -e " }," >> ${output}/results/json/${output}_lab_dr_report.json
+
+        	## add the below mutations to the json
+                echo -e " \"Minor.Mutations\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+                echo -e "   \"piother.mutations\":\"$piother\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                echo -e "   \"rtother.mutations\":\"$rtother\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                echo -e "   \"instiother.mutations\":\"$inother\"" >> ${output}/results/json/${output}_lab_dr_report.json
+                echo -e " }," >> ${output}/results/json/${output}_lab_dr_report.json
+                
+		### Add the comments to the json
+                echo -e " \"comments\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+
+                #### Create the comments files
+                touch ${output}_nnrti_comments.csv
+                touch ${output}_nrti_comments.csv
+                touch ${output}_pimajor_comments.csv
+                touch ${output}_piaccessory_comments.csv
+                touch ${output}_instimajor_comments.csv
+                touch ${output}_instiaccessory_comments.csv
+
+                #### Create the mutation files
+                touch ${output}_nnrti_muts.csv
+                touch ${output}_nrti_muts.csv
+                touch ${output}_pimajor_muts.csv
+                touch ${output}_piaccessory_muts.csv
+                touch ${output}_instimajor_muts.csv
+                touch ${output}_instiaccessory_muts.csv
+
+                #### extract mutations
+                sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | awk '{match($0, /[0-9]+/); digit = substr($0, RSTART, RLENGTH); print substr($0, 1, 1) digit substr($0, length($0))}' > ${output}_pimajor_muts.csv
+                sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | awk '{match($0, /[0-9]+/); digit = substr($0, RSTART, RLENGTH); print substr($0, 1, 1) digit substr($0, length($0))}' > ${output}_piaccessory_muts.csv
+                sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | awk '{match($0, /[0-9]+/); digit = substr($0, RSTART, RLENGTH); print substr($0, 1, 1) digit substr($0, length($0))}' > ${output}_instimajor_muts.csv
+                sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | awk '{match($0, /[0-9]+/); digit = substr($0, RSTART, RLENGTH); print substr($0, 1, 1) digit substr($0, length($0))}' > ${output}_instiaccessory_muts.csv
+
+                #### Extract the comments
+                grep -A3 comments ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -A1 -w NNRTI | grep text | sort -u | cut -f2 -d":" | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/\n/' > ${output}_nnrti_comments.csv
+                grep -A3 comments ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -A1 -w NRTI | grep text | sort -u | cut -f2 -d":" | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/\n/' > ${output}_nrti_comments.csv
+                grep -A3 -B2 comments ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep text | grep -A1 -f ${output}_pimajor_muts.csv | grep "                        \"text\"" | cut -f2 -d":" | sort -u | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/\n/' > ${output}_pimajor_comments.csv
+                grep -A3 -B2 comments ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep text | grep -A1 -f ${output}_piaccessory_muts.csv | grep "                        \"text\"" | cut -f2 -d":" | sort -u | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/\n/' > ${output}_piaccessory_comments.csv
+                grep -A3 -B2 comments ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep text | grep -A1 -f ${output}_instimajor_muts.csv | grep "                        \"text\"" | cut -f2 -d":" | sort -u | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/\n/' > ${output}_instimajor_comments.csv
+                grep -A3 -B2 comments ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep text | grep -A1 -f ${output}_instiaccessory_muts.csv | grep "                        \"text\"" | cut -f2 -d":" | sort -u | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/\n/' > ${output}_instiaccessory_comments.csv
+
+                #NEW COMMENTS EXTRACTION
+                ##PI
+                touch ${output}_pi_mutsmajor.csv
+                echo "xxx" > ${output}_pi_mutsmajor.csv
+                touch ${output}_pi_mutsaccessory.csv
+                echo "xxx" > ${output}_pi_mutsaccessory.csv
+                sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/pi_drms.csv >> ${output}_pi_mutsmajor.csv
+                sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"PR\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/pi_drms.csv >> ${output}_pi_mutsaccessory.csv
+
+                rm ${output}_pimajor_comments.csv
+                touch ${output}_pimajor_comments.csv
+                for i in $(cat ${output}_pi_mutsmajor.csv)
+                do
+                        sed -n "/^$i\t/p" ${mutations}/pi_comments.csv
+                done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_pimajor_comments.csv
+
+                rm ${output}_piaccessory_comments.csv
+                touch ${output}_piaccessory_comments.csv
+                for i in $(cat ${output}_pi_mutsaccessory.csv)
+                do
+                        sed -n "/^$i\t/p" ${mutations}/pi_comments.csv
+                done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_piaccessory_comments.csv
+
+                ##INSTI
+                touch ${output}_insti_mutsmajor.csv
+                echo "xxx" > ${output}_insti_mutsmajor.csv
+                touch ${output}_insti_mutsaccessory.csv
+                echo "xxx" > ${output}_insti_mutsaccessory.csv
+                sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Major | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/insti_drms.csv >> ${output}_insti_mutsmajor.csv
+                sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"IN\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -A 1 Accessory | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/insti_drms.csv >> ${output}_insti_mutsaccessory.csv
+
+                rm ${output}_instimajor_comments.csv
+                touch ${output}_instimajor_comments.csv
+                for i in $(cat ${output}_insti_mutsmajor.csv)
+                do
+                        sed -n "/^$i\t/p" ${mutations}/insti_comments.csv
+                done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_instimajor_comments.csv
+
+                rm ${output}_instiaccessory_comments.csv
+                touch ${output}_instiaccessory_comments.csv
+                for i in $(cat ${output}_insti_mutsaccessory.csv)
+                do
+                        sed -n "/^$i\t/p" ${mutations}/insti_comments.csv
+                done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_instiaccessory_comments.csv
+
+                ##NRTI
+                touch ${output}_nrti_mutsmajor.csv
+                echo "xxx" > ${output}_nrti_mutsmajor.csv
+                sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 NRTI | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/nrti_drms.csv >> ${output}_nrti_mutsmajor.csv
+
+                rm ${output}_nrti_comments.csv
+                touch ${output}_nrti_comments.csv
+                for i in $(cat ${output}_nrti_mutsmajor.csv)
+                do
+                        sed -n "/^$i\t/p" ${mutations}/nrti_comments.csv
+                done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_nrti_comments.csv
+
+                ##NNRTI
+                touch ${output}_nnrti_mutsmajor.csv
+                echo "xxx" > ${output}_nnrti_mutsmajor.csv
+                sed -z 's/\n/#/g' ${output}/results/sierralocal_output/${output}_sierralocal_report.json | grep -o "\"name\": \"RT\".*" | awk 'BEGIN {OFS=FS="SDRMs"} {print $1}' | sed -z 's/#/\n/g' | grep -E "primary|text" | grep -wA 1 NNRTI | grep text | cut -f2 -d":" | sed 's/ //g; s/"//g; s/,//g' | grep -wf - ${mutations}/nnrti_drms.csv >> ${output}_nnrti_mutsmajor.csv
+
+                rm ${output}_nnrti_comments.csv
+                touch ${output}_nnrti_comments.csv
+                for i in $(cat ${output}_nnrti_mutsmajor.csv)
+                do
+                        sed -n "/^$i\t/p" ${mutations}/nnrti_comments.csv
+                done | cut -f2- -d"," | sed 's/"//g; s/^[ \t]*//' | sed -z 's/\n/|/g; s/|$/|/' >> ${output}_nnrti_comments.csv
+########################################################################################################################################
+                ##### Add RT comments
+                echo "==============add rt comments================="
+                echo -e " \"rt\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+                echo -e "   \"nnrti\":\"$(cat ${output}_nnrti_comments.csv)\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                echo -e "   \"nrti\":\"$(cat ${output}_nrti_comments.csv)\"" >> ${output}/results/json/${output}_lab_dr_report.json
+                echo -e " }," >> ${output}/results/json/${output}_lab_dr_report.json
+
+                ###### Add PI comments
+                echo "===========add pi comments==============="
+                echo -e " \"pi\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+                echo -e "   \"major\":\"$(cat ${output}_pimajor_comments.csv)\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                echo -e "   \"accessory\":\"$(cat ${output}_piaccessory_comments.csv)\"" >> ${output}/results/json/${output}_lab_dr_report.json
+                echo -e " }," >> ${output}/results/json/${output}_lab_dr_report.json
+
+                ##### Add INSTI comments
+                echo "====================add insti comments============"
+                echo -e " \"insti\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+                echo -e "   \"major\":\"$(cat ${output}_instimajor_comments.csv)\"," >> ${output}/results/json/${output}_lab_dr_report.json
+                echo -e "   \"accessory\":\"$(cat ${output}_instiaccessory_comments.csv)\"" >> ${output}/results/json/${output}_lab_dr_report.json
+                echo -e " }" >> ${output}/results/json/${output}_lab_dr_report.json
+                echo -e "}," >> ${output}/results/json/${output}_lab_dr_report.json
+                echo -e " \"runDetails\":{" >> ${output}/results/json/${output}_lab_dr_report.json
+                echo -e "   \"amplified\": "true"," >> ${output}/results/json/${output}_lab_dr_report.json # add amplification
+                echo -e "   \"testDate\":\"$(date +%F" "%T)\"" >> ${output}/results/json/${output}_lab_dr_report.json
+                echo -e "  }\n}" >> ${output}/results/json/${output}_lab_dr_report.json
+
+
+                echo "==============making final json for $output====================="
+                sed -i 's/DFT/D4T/g' ${output}/results/json/${output}_lab_dr_report.json # convert DFT back to DFT
+                cat ${output}/results/json/${output}_lab_dr_report.json | sed -z 's/,\n ]/\n ]/; s/|"/"/' > ${output}/results/json/${output}.json
+                rm ${output}/results/json/${output}_lab_dr_report.json
+
+                ## Create pdf report
+                echo "DRUG CLASS,DRUG,RESISTANCE PROFILE,DRMS above 20 percent prevalence" > ${output}/results/json/${output}_res.csv # create header for the resistance profile
+                for i in $(grep -A3 "Drug.Class" ${output}/results/json/${output}.json | grep -v Name | cut -f2 -d":" | grep -v "\-\-" |   awk 'ORS=NR%3?"\t":"\n"' | sed 's/"//g; s/,//g; s/\t/,/g' | cut -f1 -d",")
+                do
+                        mut=$(grep -A6 Major.Mutations ${output}/results/json/${output}.json | grep -i -w "$i" | cut -f2 -d":" | sed 's/"//g' | sed 's/,$//' | sed -z 's/\n/#/g; s/#$/\n/; s/#/,/g' | sed 's/,$//')
+                        echo $mut
+                done | sed 's/,/;/g' > ${output}/results/json/${output}_mutations.csv ## Create a list of mutations
+                grep -A3 "Drug.Class" ${output}/results/json/${output}.json | grep -v Name | cut -f2 -d":" | grep -v "\-\-" |   awk 'ORS=NR%3?"\t":"\n"' | sed 's/Susceptible/S/; s/Potential Low-Level Resistance/PLR/; s/Low-Level Resistance/LR/; s/Intermediate Resistance/IR/; s/High-Level Resistance/HR/' | sed 's/"//g; s/,//g; s/\t/,/g' | paste -d"," - ${output}/results/json/${output}_mutations.csv | sed -E 's/\([0-9]+(\.[0-9]+)?%\)//g'  >> ${output}/results/json/${output}_res.csv ## add resistance profiles together with the mutations
+
+                ## create comments file
+                echo -e "DRUG CLASS\tCOMMENTS" > ${output}/results/json/${output}_comments_drugs.csv ## add header
+
+                ### PI
+                grep -A 11 comments ${output}/results/json/${output}.json | grep -w -A 2 pi | grep -E "major|accessory" | cut -f2- -d":" | sed 's/"//g; s/|$//' | sed 's/|/\n/g; s/,$//' | sort -u > ${output}/results/json/${output}_pi.csv
+                pi=$(cat ${output}/results/json/${output}_pi.csv | wc -l)
+                for i in $(seq 1 $pi)
+                do
+                        echo PI >> ${output}/results/json/${output}_PI_com
+                done
+                paste ${output}/results/json/${output}_PI_com ${output}/results/json/${output}_pi.csv >> ${output}/results/json/${output}_comments_drugs.csv
+
+                ### NRTI
+                grep -A 11 comments ${output}/results/json/${output}.json | grep -w "\"nrti\"" | cut -f2- -d":" | sed 's/"//g; s/|$//' | sed 's/|/\n/g; s/,$//' | sort -u > ${output}/results/json/${output}_nrti.csv
+                nrti=$(cat ${output}/results/json/${output}_nrti.csv | wc -l)
+                for i in $(seq 1 $nrti)
+                do
+                        echo NRTI >> ${output}/results/json/${output}_NRTI_com
+                done
+                paste ${output}/results/json/${output}_NRTI_com ${output}/results/json/${output}_nrti.csv >> ${output}/results/json/${output}_comments_drugs.csv
+
+                ### NNRTI
+                grep -A 11 comments ${output}/results/json/${output}.json | grep -w "\"nnrti\"" | cut -f2- -d":" | sed 's/"//g; s/|$//' | sed 's/|/\n/g; s/,$//' | sort -u > ${output}/results/json/${output}_nnrti.csv
+                nnrti=$(cat ${output}/results/json/${output}_nnrti.csv | wc -l)
+                for i in $(seq 1 $nnrti)
+                do
+                        echo NNRTI >> ${output}/results/json/${output}_NNRTI_com
+                done
+                paste ${output}/results/json/${output}_NNRTI_com ${output}/results/json/${output}_nnrti.csv >> ${output}/results/json/${output}_comments_drugs.csv
+
+                ### INSTI
+                grep -A 11 comments ${output}/results/json/${output}.json | grep -w -A 2 insti | grep -E "major|accessory" | cut -f2- -d":" | sed 's/"//g; s/|$//' | sed 's/|/\n/g; s/,$//' | sort -u > ${output}/results/json/${output}_insti.csv
+                insti=$(cat ${output}/results/json/${output}_insti.csv | wc -l)
+                for i in $(seq 1 $insti)
+                do
+                        echo INSTI >> ${output}/results/json/${output}_INSTI_com
+                done
+                paste ${output}/results/json/${output}_INSTI_com ${output}/results/json/${output}_insti.csv >> ${output}/results/json/${output}_comments_drugs.csv
+
+                ## Create appropriate Rmd
+                cp ${HIVDIR}/accessories/bin/hivdr.Rmd ${output}.Rmd
+                sed -i "s;output_id;$output;" ${output}.Rmd
+                sed -i "s;resistance profile;${output}/results/json/${output}_res.csv;" ${output}.Rmd
+                sed -i "s;comments profile;${output}/results/json/${output}_comments_drugs.csv;" ${output}.Rmd
+
+                cp ${HIVDIR}/accessories/bin/pdf.R render_pdf.R
+                sed -i "s;copy;$output;" render_pdf.R
+                Rscript render_pdf.R
+                mv ${output}.pdf ${output}/results/
+                rm ${output}.Rmd
+                rm -rf ${output}/results/sierralocal_output
+                cut -f1-3 -d"," ${output}/results/json/${output}_res.csv > ${output}/results/${output}_res.csv
+                cut -f1,4 -d"," ${output}/results/json/${output}_res.csv | sort -u > ${output}/results/${output}_drms20.csv
+                rm render_pdf.R
+                rm -rf ${output}/results/json
+                ## remove the created csv files at the end of the run
+
+                rm *csv
+
+	fi
+fi	
+
+rm drug_score_level.R

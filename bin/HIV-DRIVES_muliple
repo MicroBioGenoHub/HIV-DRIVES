@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+
+#set -eux
+xml="" # HIV algorithm xml
+alignment="nuc" # choose between postalign and nucamino
+tsv="" # path of APOBEC mutations
+update=false # update the sierralocal program
+cores=4 # get number of cpus to use
+intab="" # path of tab file
+
+while [[ $# -gt 0 ]]
+do
+        case "$1" in
+                --xml)
+                        xml="$2"
+                        shift 2
+                        ;;
+                --alignment)
+                        alignment="$2"
+                        shift 2
+                        ;;
+                --tsv)
+                        tsv="$2"
+                        shift 2
+                        ;;
+                --update)
+                        update=true
+                        shift 2
+                        ;;
+                --cores)
+                        cores="$2"
+                        shift 2
+                        ;;
+		--intab)
+			intab="$2"
+			shift 2
+			;;
+                *)
+                        echo "Invalid option: $1" >&2
+                        exit 1
+                        ;;
+        esac
+done
+
+if [ -z $intab ]
+then
+	echo "Missing required option" >&2
+	echo "Usage: bash HIV-DRIVES_multiple.sh --intab <tab separated file>"
+	exit 1
+fi
+
+# This is for running multiple samples given the tab file
+mode=$(grep mode $intab | grep -v "#" | cut -f2 -d":" | sed 's/ //g')
+echo $mode
+if [ "$mode" = "resistance" ]
+then
+	for i in $(cut -f1 $intab | grep -Ev "#|mode" | sed 's/[ \t]//g' | sed '/^$/d')
+	do
+		filet=$(grep -w $i $intab | grep -v "#" | cut -f3)
+		filep=$(grep -w $i $intab | grep -v "#" | cut -f2)
+		echo "$filet,$filep"
+		(
+			echo "Display $filep"
+			cat $filep
+			source HIV-DRIVES -o $i --resistance true --$filet  $filep
+			echo "Display $filep"
+			cat $filep
+		)
+		# check the exit status
+		if [ $? -ne 0 ]
+		then
+			echo "Failed to process $i"
+		fi
+	done
+else
+	for i in $(cut -f1 $intab | grep -Ev "#|mode" | sed 's/[ \t]//g' | sed '/^$/d')
+	do
+		layout=$(grep -w $i $intab | grep -v "#" | awk '{print $NF}')
+		if [ "$layout" = "se" ]
+		then
+			R=$(grep -w $i $intab | grep -v "#" | cut -f2)
+			(
+				source HIV-DRIVES -o $i --single-end true --se $R --$mode true
+			)
+			# check the exit status 
+			if [ $? -ne 0 ]
+			then
+				echo "Failed to process $i"
+			fi
+		elif [ "$layout" = "paired" ]
+		then
+			forward_read=$(grep -w $i $intab | grep -v "#" | cut -f2)
+			reverse_read=$(grep -w $i $intab | grep -v "#" | cut -f3)
+			(
+				source HIV-DRIVES -o $i -f $forward_read -r $reverse_read --$mode true 
+			)
+			# check the exit status
+			if [ $? -ne 0 ]
+			then
+				echo "Failed to process $i"
+			fi
+		fi
+	done
+fi
