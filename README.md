@@ -93,9 +93,12 @@ For further explanation please visit: https://github.com/MicroBioGenoHub/HIV-DRI
 
 ## How to run currently
 
+If you have paired ended reads and you want to run the full pipeline, use the command below
+
 ```
 HIV-DRIVES -o <output_dir> -f <forward read path> -r <reverse read path> --all true
 ```
+For more user case scenarios, refer to [case scenarios](cases.md)
 
 ## 📝 Information
 
