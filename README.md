@@ -2,7 +2,7 @@
 
 HIV-DRIVES is a pipeline designed to perform HIV Drug resistance profiling, Variant Evaluation, and Surveillance while giving an easy to read pdf report besides the other output files. HIV-DRIVES supports illumina data in paired and single ended fastq format, sanger data in ab1.seq format, and both fasta and multiple fasta files. Given illumina data, HIV-DRIVES additionally separates the patient's reads from the viral reads before it proceeds with the downstream processes. Therefore, this facilitates sharing of viral reads while protecting the patient's privacy. HIV-DRIVES is supported by both sierra-local and quasitools in the background
 
-## Motivation
+## 🏆 Motivation
 
 The global prevalence of resistance to the Human Immunodeficiency Virus (HIV) antiretroviral therapy (ART) drugs emphasizes the need to fast-track the transition to the newer regimens such as dolutegravir-based combinations. In order to slow down or halt HIV drug resistance (HIVDR), all stakeholders need to promote the availability of optimal medicines to treat HIV infections, support retention in care and optimal adherence to treatment, and increase access and use of viral load testing to know if HIV treatment is working, and rapidly switch regimens in cases of confirmed treatment failure and lastly, use of next-generation sequencing (NGS) for HIVDR profiling to guide treatment.  Africa also accounts for nearly two thirds of the global total of new HIV infections and remains the most affected region, with at least 25.7 million people living with HIV in 2018. COVID-19 catapulted routine NGS in many national public health laboratories in Africa and is poised to support genomic activities in different disease programs including HIV. A number of countries embracing performing NGS-HIVDR are facing the challenge of bioinformatics analysis and interpretation of the data for patient management. We present HIV-DRIVES (HIV Drug Resistance Identification, Variant Evaluation, and Surveillance), an NGS-HIVDR bioinformatics pipeline that has been developed and validated using Illumina short-reads, sanger ab1.seq files, and fasta files to HIVDR testing and interpretation.
 
@@ -37,9 +37,59 @@ Select the installer for your computer and execute it by running:
 
 `rm -rf clean.sh`
 
+Run the program to make sure you have access to all the plug-ins using the command `HIV-DRIVES -h` to view output below:
 
+```bash
+This is HIV-DRIVES 1.0
+Developed and maintained by Stephen Kanyerezi, Ivan Sserwadda & Gerald Mboowa
 
+Synopsis:
+HIV-DRIVES enables one to do HIV Drug Resistance Identification, Variant Evaluation, and Surveillance
 
+Usage:
+Given paired reads, to run the whole pipeline; HIV-DRIVES [options] -f <path of forward read> -r <path of reverse read> -o <output directory to be created> --all true
+Given paired reads, to perform variant calling and generate a consensus genome; HIV-DRIVES [options] -r <path of reverse read> -o <output directory to be created> --varcall true
+Given single ended reads, to run the whole pipeline; HIV-DRIVES [options] -o <output directory to be created> --single-end true --se <path of single ended read> --all true
+Given single ended reads, to perform variant calling and generate a consensus genome; HIV-DRIVES [options] -o <output directory to be created> --single-end true --se <path of single ended read> --varcall true
+
+General:
+-h/--help       Show this help menu
+-v/--version    Print version and exit
+-x/--citation   Show citation and exit
+
+Mandatory options for paired reads:
+-f/--forward-read Path of the forward reads [either .fastq or .fastq.gz]
+
+-r/--reverse-read Path of the reverse reads [either .fastq or .fastq.gz]
+
+-s/--single-end [true or false (default)] Set to true if single ended reads
+
+--se                Path of single end read. Applicable if --single-end set to true
+
+--consensus Path of fasta file from which to perform resistance profiling as well as variants detection. Applicable if you only have consensus genomes
+
+-o/--output-dir        Directory to be created for results
+
+--all                [true or false (default)] Run the whole pipeline to generate variants, consensus genome, and resistance profiles. Applicable if --varcall not set to true
+
+--varcall        [true or false (default)] Genrate variants and consensus genome. Applicable if --all not set to true
+
+--resistance [true or false (default)] Perform resistance profiling as well as variants detection. Applicable only with --consensus option and if --varcall and --all not set to true
+
+Other options:
+--xml Path of HIV algorithm xml file to be used
+
+--alignment [post or nuc (default)] amino acid aligner to be used. Either postalign or nucamino
+
+--json Path of APOEBEC mutations file
+
+--update [true or false (default)] update the HIV algorithm and APOEBEC mutations
+
+--cores Number of cpus to use. Default=4
+                     
+For further explanation please visit: https://github.com/MicroBioGenoHub/HIV-DRIVES
+
+```
 
 ## How to run currently
 
@@ -71,6 +121,20 @@ This pipeline was written by a collaborative effort between Stephen Kanyerezi [K
 ### 🔌 Third Party Plugins
 
 This softwares' foundation is built using pre-existing tools. When using it, please don't forget to cite the following:
+- [Bowtie2](https://github.com/BenLangmead/bowtie2)
+- 
+- [Pip](https://pypi.org/project/pip/)
+- [r-base=4.1.1](https://www.r-project.org/)
+  + [r-rmarkdown=2.14](https://cran.r-project.org/web/packages/rmarkdown/index.html)
+  + [r-jsonlite=1.8.0](https://cran.r-project.org/web/packages/jsonlite/index.html)
+  + [r-knitr=1.39](https://cran.r-project.org/web/packages/knitr/index.html)
+  + [r-dplyr=1.0.9](https://cran.r-project.org/web/packages/dplyr/index.html)
+  + [r-kableextra](https://cran.r-project.org/web/packages/kableExtra/index.html)
+  + [r-tidyr=1.2.0](https://cran.r-project.org/web/packages/tidyr/index.html)
+- [Quasitools=0.7.0](https://github.com/phac-nml/quasitools)
+- [Samtools](https://github.com/samtools/samtools)
+- [Sierralocal](https://github.com/PoonLab/sierra-local)
+- [Trim-galore](https://github.com/FelixKrueger/TrimGalore)
 
 
 
