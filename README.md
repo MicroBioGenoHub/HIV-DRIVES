@@ -63,5 +63,14 @@ This pipeline was written by a collaborative effort between Stephen Kanyerezi [K
 - [Ivan Sserwadda](https://github.com/GunzIvan28)
 - [Gerald Mboowa](https://github.com/gmboowa)
 
+### 🙏 Acknowledgements
+
+
+### 🔌 Third Party Plugins
+
+This softwares' foundation is built using pre-existing tools. When using it, please don't forget to cite the following:
+
+
+
 
 Note: Current tests are on Ubuntu 18.04.6 LTS using paired end reads from the illumina platform
