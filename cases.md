@@ -51,11 +51,16 @@ HIV-DRIVES -o <output directory to be created> --consensus <path of fasta file> 
 10. I have several fasta files, I want to get resistance profiles for each
 	- To run, create a tab separated file. This file starts with a line that describes the mode to run. The line is followed by 3 columns. Each line or row represents a single sample. The first column should have the name of the directory to be created for that sample, second column has path of the fasta file, and the third column describing  will be consensus for this case
 	- Refer to [Multiple sample instructions](multiple.md) for a detailed description
+```
+HIV-DRIVES_multiple --intab <created tab separated file>
+```
 11. I have a sanger file in ab1.seq format, I want to get resistance profiles
 ```
 HIV-DRIVES -o <output directory to be created> --sanger <path of ab1.seq file> --resistance true
 ```
-10. I have several sanger files, I want to get resistance profiles for each
+12. I have several sanger files, I want to get resistance profiles for each
         - To run, create a tab separated file. This file starts with a line that describes the mode to run. The line is followed by 3 columns. Each line or row represents a single sample. The first column should have the name of the directory to be created for that sample, second column has path of the ab1.seq file, and the third column describing  will be sanger for this case
         - Refer to [Multiple sample instructions](multiple.md) for a detailed description
-
+```
+HIV-DRIVES_multiple --intab <created tab separated file>
+```
