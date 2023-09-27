@@ -9,7 +9,7 @@ HIV-DRIVES -f <path of forward read> -r <path of reverse read> -o <output direct
 	- To run, create a tab separated file. This file starts with a line that describes the mode to run. The line is followed by 4 columns. Each line or row represents a single sample. The first column should have the name of the directory to be created for that sample, second column has path of the forward read, third column has path of the reverse read, and the fourth column describing the layout which is paired for this case
 	- Refer to [Multiple sample instructions](multiple.md) for a detailed description
 ```
-HIV-DRIVES_multiple --tab <created tab separated file>
+HIV-DRIVES_multiple --intab <created tab separated file>
 ```
 3. I have forward and reverse reads. I only want to perform variant calling and consensus generation
 
@@ -20,7 +20,7 @@ HIV-DRIVES -f <path of forward read> -r <path of reverse read> -o <output direct
 	- To run, create a tab separated file. This file starts with a line that describes the mode to run. The line is followed by 4 columns. Each line or row represents a single sample. The first column should have the name of the directory to be created for that sample, second column has path of the forward read, third column has path of the reverse read, and the fourth column describing the layout which is paired for this case
 	- Refer to [Multiple sample instructions](multiple.md) for a detailed description
 ```
-HIV-DRIVES_multiple --tab <created tab separated file>
+HIV-DRIVES_multiple --intab <created tab separated file>
 ```
 5. I have single ended reads. I want to get resistance profiles
 	- This applies with those having illumina single ended reads. This also works if one has either forward or reverse reads but not both
@@ -31,7 +31,7 @@ HIV-DRIVES --single-end true --se <path of single ended read> -o <output directo
 	- To run, create a tab separated file. This file starts with a line that describes the mode to run. The line is followed by 3 columns. Each line or row represents a single sample. The first column should have the name of the directory to be created for that sample, second column has path of the single ended read, and the third column describing the layout which is se for this case
 	- Refer to [Multiple sample instructions](multiple.md) for a detailed description
 ```
-HIV-DRIVES_multiple --tab <created tab separated file>
+HIV-DRIVES_multiple --intab <created tab separated file>
 ```
 7. I have single ended reads. I want to perform variant calling as well as generate a consensus genome
 	- This applies with those having illumina single ended reads. This also works if one has either forward or reverse reads but not both
@@ -42,7 +42,7 @@ HIV-DRIVES -o <output directory to be created> --single-end true --se <path of s
 	- To run, create a tab separated file. This file starts with a line that describes the mode to run. The line is followed by 3 columns. Each line or row represents a single sample. The first column should have the name of the directory to be created for that sample, second column has path of the single ended read, and the third column describing the layout which is se for this case
 	- Refer to [Multiple sample instructions](multiple.md) for a detailed description
 ```
-HIV-DRIVES_multiple --tab <created tab separated file>
+HIV-DRIVES_multiple --intab <created tab separated file>
 ```
 9. I have a fasta/mulitfasta file, I want to get resistance profiles
 ```
