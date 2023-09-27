@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 . "$CONDA_PREFIX/etc/profile.d/conda.sh"
-conda activate HIV-DRIVES
+conda activate base
 pref_conda=$(echo $CONDA_PREFIX)
+conda activate HIV-DRIVES
 HIVDIR="$pref_conda/envs/HIV-DRIVES"
 mkdir "$HIVDIR"/accessories
 pip install https://github.com/hivdb/post-align/archive/8e2ee118261987208c17add6cef5c1270e325a4c.zip
