@@ -20,7 +20,7 @@ unzip GRCh38_noalt_as.zip
 mv GRCh38_noalt_as data/reference
 rm GRCh38_noalt_as.zip
 mv bin "${HIVDIR}"/accessories/ && mv data* "${HIVDIR}"/accessories/
-echo "export PATH=${HIVDIR}/accessories/bin/:$PATH" >>~/.bashrc
+echo "export PATH=${HIVDIR}/accessories/bin:$PATH" >>~/.bashrc
 source ~/.bashrc
 touch ../clean.sh &
 echo "#!/usr/bin/env bash" >../clean.sh
