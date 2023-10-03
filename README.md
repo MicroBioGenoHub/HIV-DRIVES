@@ -1,5 +1,5 @@
 <p align="middle">`
-<img width="550" height="300" src="databases/logo.png">
+<img width="770" height="200" src="databases/logo.png">
 </p>
 
 ## 🎬 HIV-DRIVES: HIV Drug Resistance Identification, Variant Evaluation, & Surveillance
@@ -154,7 +154,7 @@ For support or any inquiry:
 You can submit your query using the [issue tracker](https://github.com/MicroBioGenoHub/HIV-DRIVES/issues)
 
 <p align="middle">`
-<img width="550" height="300" src="databases/logo.png">
+<img width="770" height="200" src="databases/logo.png">
 </p>
 
 Note: Current tests are on Ubuntu 18.04.6 LTS using paired end reads from the illumina platform
