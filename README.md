@@ -114,11 +114,11 @@ For more user case scenarios, refer to [case scenarios](cases.md)
 
 When using HIV-DRIVES, please cite as:   
 
-https://github.com/MicroBioGenoHub/HIV-DRIVES.git. The manuscript for this pipeline can be accessed via [BioRix]() and is currently under review. We will update the repository with the manuscript link once the publication is released
+https://github.com/MicroBioGenoHub/HIV-DRIVES.git. The pre-print for this pipeline can be accessed via [medRxiv](https://www.medrxiv.org/content/10.1101/2023.09.30.23296350v1) and is currently under review. We will update the repository with the link to the peer-reviewed manuscript once the publication is released.
 
 ### 🎞️ Credits
 
-This pipeline was written by a collaborative effort between Stephen Kanyerezi [Kanyerezi30](https://github.com/Kanyerezi30), ( Ivan Sserwadda [GunzIvan28](https://github.com/GunzIvan28) and Gerald Mboowa [gmboowa](https://github.com/gmboowa). If you want to contribute, please open an issue or a pull request and ask to be added to the project - everyone is welcome to contribute
+This pipeline was written by a collaborative effort between Stephen Kanyerezi [Kanyerezi30](https://github.com/Kanyerezi30), Ivan Sserwadda [GunzIvan28](https://github.com/GunzIvan28) and Gerald Mboowa [gmboowa](https://github.com/gmboowa). If you want to contribute, please open an issue or a pull request and ask to be added to the project - everyone is welcome to contribute.
 
 ### ✍️ Authors
 
@@ -127,7 +127,7 @@ This pipeline was written by a collaborative effort between Stephen Kanyerezi [K
 - [Gerald Mboowa](https://github.com/gmboowa)
 
 ### 🙏 Acknowledgements
-
+We would like to express our heartfelt gratitude to the developers of Sierra-local and Quasitools for their invaluable contributions to the development of HIV-DRIVES. Their exceptional tools have played a pivotal role in enhancing the functionality and efficiency of our work, and we are sincerely thankful for their dedication and expertise.
 
 ### 🔌 Third Party Plugins
 
