@@ -11,7 +11,7 @@ git clone http://github.com/PoonLab/sierra-local
 cd sierra-local
 sudo "${pref_conda}"/envs/HIV-DRIVES/bin/python3 setup.py install
  mv ${HOME}/HIV-DRIVES/algorithm "${HIVDIR}"/accessories/
-"${pref_conda}"/envs/HIV-DRIVES/bin/python3 "${HIVDIR}"/algorithm/updater.py
+"${pref_conda}"/envs/HIV-DRIVES/bin/python3 "${HIVDIR}"/accessories/algorithm/updater.py
 cd ${HOME}/HIV-DRIVES
 conda create --prefix ${pref_conda}/envs/HIV-DRIVES/quasi -c bioconda quasitools=0.7.0 -y
 wget https://genome-idx.s3.amazonaws.com/bt/GRCh38_noalt_as.zip
