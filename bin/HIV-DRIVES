@@ -1099,7 +1099,7 @@ then
         		for i in $(cut -f3 -d"," ${output}_drug_score_resistance.csv | grep -v Drug | sed 's/"//g') # access the drug names
         		do
                 		dclass=$(grep -w $i ${output}_drug_score_resistance.csv | cut -f2 -d"," | sed 's/"//g') # create drug class
-                		dname=$(grep -w $i ${HOME}/HIV-DRIVES/databases/drug_names.csv | cut -f2 -d",") # create drug name
+                		dname=$(grep -w $i ${HIVDIR}/accessories/databases/drug_names.csv | cut -f2 -d",") # create drug name
                 		dcode=$i
                 		dresistancelevel=$(grep -w $i ${output}_drug_score_resistance.csv | cut -f5 -d",") # create resistance level
                 		dscore=$(grep -w $i ${output}_drug_score_resistance.csv | cut -f4 -d",") # create the score
