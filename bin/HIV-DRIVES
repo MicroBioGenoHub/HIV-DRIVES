@@ -545,6 +545,7 @@ then
                 	sed -i "s;output_id;$output;" ${output}.Rmd
                 	sed -i "s;resistance profile;${output}/results/json/${output}_res.csv;" ${output}.Rmd
                 	sed -i "s;comments profile;${output}/results/json/${output}_comments_drugs.csv;" ${output}.Rmd
+			sed -i "s;~/HIV-DRIVES;${HIVDIR}/accessories;" ${output}.Rmd
 
                 	cp ${HIVDIR}/accessories/bin/pdf.R render_pdf.R
                 	sed -i "s;copy;$output;" render_pdf.R
@@ -925,7 +926,8 @@ then
 		sed -i "s;output_id;$output;" ${output}.Rmd
 		sed -i "s;resistance profile;${output}/results/json/${output}_res.csv;" ${output}.Rmd
 		sed -i "s;comments profile;${output}/results/json/${output}_comments_drugs.csv;" ${output}.Rmd
-		
+		sed -i "s;~/HIV-DRIVES;${HIVDIR}/accessories;" ${output}.Rmd
+
 		cp ${HIVDIR}/accessories/bin/pdf.R render_pdf.R
 		sed -i "s;copy;$output;" render_pdf.R
 		Rscript render_pdf.R
@@ -933,16 +935,16 @@ then
                 mv ${output}/results/hydra_output/hydra.vcf ${output}/results/${output}.vcf
                 mv ${output}/results/hydra_output/mutation_report.aavf ${output}/results/${output}.aavf
                 mv ${output}.pdf ${output}/results/
-                #rm ${output}.Rmd
-                #rm -rf ${output}/results/hydra_output
-		#rm -rf ${output}/results/sierralocal_output
+                rm ${output}.Rmd
+                rm -rf ${output}/results/hydra_output
+		rm -rf ${output}/results/sierralocal_output
 		cut -f1-3 -d"," ${output}/results/json/${output}_res.csv > ${output}/results/${output}_res.csv
       		cut -f1,4 -d"," ${output}/results/json/${output}_res.csv | sort -u > ${output}/results/${output}_drms20.csv
-		#rm render_pdf.R
-		#rm -rf ${output}/results/json
+		rm render_pdf.R
+		rm -rf ${output}/results/json
 		## remove the created csv files at the end of the run
 
-		#rm *csv
+		rm *csv
 	fi
 elif [ "$varcall" = true ]
 then
@@ -1329,6 +1331,7 @@ then
                 	sed -i "s;output_id;$output;" ${output}.Rmd
                 	sed -i "s;resistance profile;${output}/results/json/${output}_res.csv;" ${output}.Rmd
                 	sed -i "s;comments profile;${output}/results/json/${output}_comments_drugs.csv;" ${output}.Rmd
+			sed -i "s;~/HIV-DRIVES;${HIVDIR}/accessories;" ${output}.Rmd
 
                 	cp ${HIVDIR}/accessories/bin/pdf.R render_pdf.R
                 	sed -i "s;copy;$output;" render_pdf.R
@@ -1631,6 +1634,7 @@ then
                 		sed -i "s;output_id;$output;" ${output}.Rmd
                 		sed -i "s;resistance profile;${output}/results/json/${output}_res.csv;" ${output}.Rmd
                 		sed -i "s;comments profile;${output}/results/json/${output}_comments_drugs.csv;" ${output}.Rmd
+				sed -i "s;~/HIV-DRIVES;${HIVDIR}/accessories;" ${output}.Rmd
 
                 		cp ${HIVDIR}/accessories/bin/pdf.R render_pdf.R
                 		sed -i "s;copy;$output;" render_pdf.R
@@ -1935,6 +1939,7 @@ then
                 sed -i "s;output_id;$output;" ${output}.Rmd
                 sed -i "s;resistance profile;${output}/results/json/${output}_res.csv;" ${output}.Rmd
                 sed -i "s;comments profile;${output}/results/json/${output}_comments_drugs.csv;" ${output}.Rmd
+		sed -i "s;~/HIV-DRIVES;${HIVDIR}/accessories;" ${output}.Rmd
 
                 cp ${HIVDIR}/accessories/bin/pdf.R render_pdf.R
                 sed -i "s;copy;$output;" render_pdf.R
