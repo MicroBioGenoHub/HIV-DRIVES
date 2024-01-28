@@ -18,7 +18,7 @@ HIV-DRIVES is able to perform:
 1. Poor read trimming using trim_galore
 2. Variant calling and consensus genome generation
 3. Host Decontamination: The program removes host reads and produces host free fastq files. This is motivated by the issue of patient privacy
-4. Consensus generation: The program uses hydra within the quasitools to generate a consesus sequence
+4. Consensus generation: The program uses hydra within the quasitools to generate a consensus sequence
 5. Variant calling: The program uses hydra within the quasitools to detect variants within the query HIV genomes
 6. Resistance profiling and mutation detection: This is performed by sierra-local. Sierra-local output is interrogated to give an easy to understand pdf report
 
