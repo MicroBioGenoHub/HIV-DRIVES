@@ -114,7 +114,7 @@ For more user case scenarios, refer to [case scenarios](cases.md)
 
 When using HIV-DRIVES, please cite as:   
 
-https://github.com/MicroBioGenoHub/HIV-DRIVES.git. The pre-print for this pipeline can be accessed via [medRxiv](https://www.medrxiv.org/content/10.1101/2023.09.30.23296350v1) and is currently under review. We will update the repository with the link to the peer-reviewed manuscript once the publication is released.
+https://github.com/MicroBioGenoHub/HIV-DRIVES.git. The publication for this pipeline can be accessed via [https://www.microbiologyresearch.org/content/journal/acmi/10.1099/acmi.0.000815.v3].
 
 ### 🎞️ Credits
 
